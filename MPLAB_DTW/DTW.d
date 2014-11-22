@@ -1,0 +1,1 @@
+DTW.o: DTW.c
