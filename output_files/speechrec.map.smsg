@@ -1,1 +1,1 @@
-Warning (10268): Verilog HDL information at speechrec.sv(69): always construct contains both blocking and non-blocking assignments
+Warning (10268): Verilog HDL information at correlate.sv(36): always construct contains both blocking and non-blocking assignments

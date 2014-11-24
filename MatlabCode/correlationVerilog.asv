@@ -1,0 +1,107 @@
+%% Amy Ngai
+% Just tests to see the best way to write the algorithm in verilogz
+close all
+% Control to make sure correlation is correct
+a = [1 2 3 4];
+b = [-1 2 1 -1];
+
+matlabXcorr = xcorr(a, b)
+figure
+plot(matlabXcorr)
+title('Result of matlab xcorr');
+
+%%
+%%
+figure
+plot(conv(a,fliplr(b)))
+title('Result of xcorr with conv');
+
+%%
+close all
+
+plot(za);
+title('za')
+figure
+plot(zb);
+title('zb');
+
+result = zeros(1,2*length(a) - 1);
+for n=1:(2*length(a) - 1)
+    for k=0:n-1
+        if ((n-k) > length(a)
+            ca = 0;
+        else
+            ca = a(n-k);
+        end
+        
+        if (length(b)-k) < 1
+            cb = 0;
+        else
+            cb = b(end-k);
+        end
+        result(n) = result(n) + ca*cb;
+    end
+end
+result
+figure
+plot(result)
+title('Result of xcorr with for loop using end');
+%%
+
+%%
+close all
+za = [zeros(1, length(b) -1) a];
+zb = [b zeros(1, length(a) -1)];
+plot(za);
+title('za')
+figure
+plot(zb);
+title('zb');
+
+fb = fliplr(zb);
+
+result = zeros(1,2*length(a) - 1);
+for n=1:(2*length(a) - 1)
+    for k=0:n-1
+        if (n-k) > length(a)
+            ca = 0;
+        else
+            ca = a(n-k);
+        end
+        
+        if (length(b)-k) < 1
+            cb = 0;
+        else
+            cb = b(end-k);
+        end
+        result(n) = result(n) + ca*cb;
+    end
+end
+result
+figure
+plot(result)
+title('Result of xcorr with for loop using end');
+
+%%
+
+
+
+
+result = zeros(19999,1);
+for i=1:(lena+lenb-1)
+    for n=1:(lena+lenb-1)
+        result(i) = result(i) + za(n)*zb(i);
+        
+    end
+end
+        
+result
+figure
+plot(result)
+title('Result of manual xcorr');
+
+%%
+figure
+plot(ifft(fft(za).*conj(fft(zb))))
+title('Result of old manual xcorr');
+

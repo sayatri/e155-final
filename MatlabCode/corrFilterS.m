@@ -45,7 +45,7 @@ end
 matchedSignal = audioName{matchIndex};
 
 plotAll(corrs, audioName)
-%plotAll(matlab, audioName)
+plotAll(matlab, audioName)
 
 % Displays the results on the screen
 disp('The result of the filter is ...')

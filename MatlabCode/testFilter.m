@@ -25,7 +25,7 @@ normTestSignal = normalizeSignal(testSignal);
 
 disp('Begin processing data with the DTW Filter...');
 
-dtwFilter(normTestSignal, normSignal, allSignalNames);
+xcorrFilter(normTestSignal, normSignal, allSignalNames);
 disp(' ');
 disp('Begin processing data with the xcorr Filter...');
 
