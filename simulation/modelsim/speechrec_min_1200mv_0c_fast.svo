@@ -16,7 +16,7 @@
 // PROGRAM "Quartus II 64-Bit"
 // VERSION "Version 13.1.0 Build 162 10/23/2013 SJ Web Edition"
 
-// DATE "11/23/2014 15:47:51"
+// DATE "11/23/2014 22:17:02"
 
 // 
 // Device: Altera EP3C5E144C8 Package TQFP144
@@ -32,20 +32,26 @@ module speechrec (
 	clk,
 	sck,
 	sdi,
+	ss,
+	reset,
 	sdo,
 	led,
-	rec_clk);
-input 	clk;
-input 	sck;
-input 	sdi;
-output 	sdo;
-output 	[7:0] led;
-output 	[3:0] rec_clk;
+	result);
+input 	logic clk ;
+input 	logic sck ;
+input 	logic sdi ;
+input 	logic ss ;
+input 	logic reset ;
+output 	logic sdo ;
+output 	logic [7:0] led ;
+output 	logic [3:0] result ;
 
 // Design Ports Information
 // clk	=>  Location: PIN_88,	 I/O Standard: 2.5 V,	 Current Strength: Default
 // sck	=>  Location: PIN_25,	 I/O Standard: 2.5 V,	 Current Strength: Default
 // sdi	=>  Location: PIN_24,	 I/O Standard: 2.5 V,	 Current Strength: Default
+// ss	=>  Location: PIN_55,	 I/O Standard: 2.5 V,	 Current Strength: Default
+// reset	=>  Location: PIN_10,	 I/O Standard: 2.5 V,	 Current Strength: Default
 // sdo	=>  Location: PIN_53,	 I/O Standard: 2.5 V,	 Current Strength: Default
 // led[0]	=>  Location: PIN_43,	 I/O Standard: 2.5 V,	 Current Strength: Default
 // led[1]	=>  Location: PIN_38,	 I/O Standard: 2.5 V,	 Current Strength: Default
@@ -55,10 +61,10 @@ output 	[3:0] rec_clk;
 // led[5]	=>  Location: PIN_31,	 I/O Standard: 2.5 V,	 Current Strength: Default
 // led[6]	=>  Location: PIN_30,	 I/O Standard: 2.5 V,	 Current Strength: Default
 // led[7]	=>  Location: PIN_28,	 I/O Standard: 2.5 V,	 Current Strength: Default
-// rec_clk[0]	=>  Location: PIN_65,	 I/O Standard: 2.5 V,	 Current Strength: Default
-// rec_clk[1]	=>  Location: PIN_66,	 I/O Standard: 2.5 V,	 Current Strength: Default
-// rec_clk[2]	=>  Location: PIN_67,	 I/O Standard: 2.5 V,	 Current Strength: Default
-// rec_clk[3]	=>  Location: PIN_68,	 I/O Standard: 2.5 V,	 Current Strength: Default
+// result[0]	=>  Location: PIN_137,	 I/O Standard: 2.5 V,	 Current Strength: Default
+// result[1]	=>  Location: PIN_69,	 I/O Standard: 2.5 V,	 Current Strength: Default
+// result[2]	=>  Location: PIN_80,	 I/O Standard: 2.5 V,	 Current Strength: Default
+// result[3]	=>  Location: PIN_99,	 I/O Standard: 2.5 V,	 Current Strength: Default
 
 
 wire gnd;
@@ -79,6 +85,8 @@ initial $sdf_annotate("speechrec_min_1200mv_0c_v_fast.sdo");
 wire \clk~input_o ;
 wire \sck~input_o ;
 wire \sdi~input_o ;
+wire \ss~input_o ;
+wire \reset~input_o ;
 wire \sdo~output_o ;
 wire \led[0]~output_o ;
 wire \led[1]~output_o ;
@@ -88,10 +96,10 @@ wire \led[4]~output_o ;
 wire \led[5]~output_o ;
 wire \led[6]~output_o ;
 wire \led[7]~output_o ;
-wire \rec_clk[0]~output_o ;
-wire \rec_clk[1]~output_o ;
-wire \rec_clk[2]~output_o ;
-wire \rec_clk[3]~output_o ;
+wire \result[0]~output_o ;
+wire \result[1]~output_o ;
+wire \result[2]~output_o ;
+wire \result[3]~output_o ;
 
 
 // Location: IOOBUF_X16_Y0_N2
@@ -211,56 +219,56 @@ defparam \led[7]~output .bus_hold = "false";
 defparam \led[7]~output .open_drain_output = "false";
 // synopsys translate_on
 
-// Location: IOOBUF_X28_Y0_N23
-cycloneiii_io_obuf \rec_clk[0]~output (
+// Location: IOOBUF_X7_Y24_N2
+cycloneiii_io_obuf \result[0]~output (
 	.i(gnd),
 	.oe(vcc),
 	.seriesterminationcontrol(16'b0000000000000000),
 	.devoe(devoe),
-	.o(\rec_clk[0]~output_o ),
+	.o(\result[0]~output_o ),
 	.obar());
 // synopsys translate_off
-defparam \rec_clk[0]~output .bus_hold = "false";
-defparam \rec_clk[0]~output .open_drain_output = "false";
+defparam \result[0]~output .bus_hold = "false";
+defparam \result[0]~output .open_drain_output = "false";
 // synopsys translate_on
 
-// Location: IOOBUF_X28_Y0_N2
-cycloneiii_io_obuf \rec_clk[1]~output (
-	.i(gnd),
+// Location: IOOBUF_X30_Y0_N2
+cycloneiii_io_obuf \result[1]~output (
+	.i(vcc),
 	.oe(vcc),
 	.seriesterminationcontrol(16'b0000000000000000),
 	.devoe(devoe),
-	.o(\rec_clk[1]~output_o ),
+	.o(\result[1]~output_o ),
 	.obar());
 // synopsys translate_off
-defparam \rec_clk[1]~output .bus_hold = "false";
-defparam \rec_clk[1]~output .open_drain_output = "false";
+defparam \result[1]~output .bus_hold = "false";
+defparam \result[1]~output .open_drain_output = "false";
 // synopsys translate_on
 
-// Location: IOOBUF_X30_Y0_N23
-cycloneiii_io_obuf \rec_clk[2]~output (
+// Location: IOOBUF_X34_Y7_N9
+cycloneiii_io_obuf \result[2]~output (
 	.i(gnd),
 	.oe(vcc),
 	.seriesterminationcontrol(16'b0000000000000000),
 	.devoe(devoe),
-	.o(\rec_clk[2]~output_o ),
+	.o(\result[2]~output_o ),
 	.obar());
 // synopsys translate_off
-defparam \rec_clk[2]~output .bus_hold = "false";
-defparam \rec_clk[2]~output .open_drain_output = "false";
+defparam \result[2]~output .bus_hold = "false";
+defparam \result[2]~output .open_drain_output = "false";
 // synopsys translate_on
 
-// Location: IOOBUF_X30_Y0_N9
-cycloneiii_io_obuf \rec_clk[3]~output (
-	.i(gnd),
+// Location: IOOBUF_X34_Y17_N16
+cycloneiii_io_obuf \result[3]~output (
+	.i(vcc),
 	.oe(vcc),
 	.seriesterminationcontrol(16'b0000000000000000),
 	.devoe(devoe),
-	.o(\rec_clk[3]~output_o ),
+	.o(\result[3]~output_o ),
 	.obar());
 // synopsys translate_off
-defparam \rec_clk[3]~output .bus_hold = "false";
-defparam \rec_clk[3]~output .open_drain_output = "false";
+defparam \result[3]~output .bus_hold = "false";
+defparam \result[3]~output .open_drain_output = "false";
 // synopsys translate_on
 
 // Location: IOIBUF_X34_Y12_N22
@@ -293,6 +301,26 @@ defparam \sdi~input .bus_hold = "false";
 defparam \sdi~input .simulate_z_as = "z";
 // synopsys translate_on
 
+// Location: IOIBUF_X18_Y0_N15
+cycloneiii_io_ibuf \ss~input (
+	.i(ss),
+	.ibar(gnd),
+	.o(\ss~input_o ));
+// synopsys translate_off
+defparam \ss~input .bus_hold = "false";
+defparam \ss~input .simulate_z_as = "z";
+// synopsys translate_on
+
+// Location: IOIBUF_X0_Y18_N15
+cycloneiii_io_ibuf \reset~input (
+	.i(reset),
+	.ibar(gnd),
+	.o(\reset~input_o ));
+// synopsys translate_off
+defparam \reset~input .bus_hold = "false";
+defparam \reset~input .simulate_z_as = "z";
+// synopsys translate_on
+
 assign sdo = \sdo~output_o ;
 
 assign led[0] = \led[0]~output_o ;
@@ -311,12 +339,12 @@ assign led[6] = \led[6]~output_o ;
 
 assign led[7] = \led[7]~output_o ;
 
-assign rec_clk[0] = \rec_clk[0]~output_o ;
+assign result[0] = \result[0]~output_o ;
 
-assign rec_clk[1] = \rec_clk[1]~output_o ;
+assign result[1] = \result[1]~output_o ;
 
-assign rec_clk[2] = \rec_clk[2]~output_o ;
+assign result[2] = \result[2]~output_o ;
 
-assign rec_clk[3] = \rec_clk[3]~output_o ;
+assign result[3] = \result[3]~output_o ;
 
 endmodule

@@ -8,64 +8,74 @@
 
 
 // assuming everything can be written as arrays
-module correlate(input logic		clk,
-				input int	a[3:0],
-				input int	b[3:0],
-				output int	result[7:0]);
+module correlate(input  logic[2:0] state,
+				input logic		clk,
+				input byte		a[1999:0], b[1999:0],
+				output byte 	result[3998:0],
+				output logic 	finished);
 
 	typedef enum logic {PROCESSING=1'b0, DONE=1'b1} statetype;
-   statetype state, nextstate;
+   statetype currentState, nextstate;
 
-    // enum logic LENGTH_A=4;
-
-	int intA, intB;	// look at one integer at a time 
-	logic[2:0] lengthResult, lengthA;
+	byte intA, intB;	// look at one integer at a time 
+	logic[31:0] lengthResult, lengthA;
 	
-	assign lengthResult = 2'd7;
-	assign lengthA = 2'd4;
+	assign lengthResult = 32'd3999;
+	assign lengthA = 32'd1999;
 	
-	/// maybe this line of code???
-	// int intA, intB
-	/// maybe....
-	logic [3:0] n;	// for n = 1
-	logic [3:0] k;	// for the second term
+	logic [3:0] n;	// FIXME
+	logic [3:0] k;	// FIXME
 
 
 
 	// State register
     always_ff @(posedge clk) begin
-        state <= nextstate;
+	 
+		// only continue if you are in the processing state from
+		// the top module
+		if (state == 3'b010) begin
+			  currentState <= nextstate;
 
-        // for n=1:(2*length(a) - 1) 
-       	if (n >= lengthResult) n <= lengthResult;
-       	else n <= (k == n)? n + 1: n;
-       	
-       	// for k=1:n
-       	if (k == n) k = 0;
-       	else k = k + 1;
+			  // for n=0:(2*length(a) - 1) -1
+				if (n >= (lengthResult - 1)) n <= lengthResult;
+				else n <= (k == n)? (n + 1): n;
+				
+				// for k=1:n
+				if (k == n) k = 0;
+				else k = k + 1;
 
-       	if (state == PROCESSING) begin // where the convolution magic happens
-       		intA <= ((n-k) > 3)? 32'b0: {a[(n-k)]};
+				if (state == PROCESSING) begin // where the convolution magic happens
+					intA <= ((n-k) > 3)? 8'b0: {a[(n-k)]};
 
-				intB <= (lengthA - k < 0)? 32'b0: {b[lengthA - k]};
+					intB <= (lengthA - k < 0)? 8'b0: {b[lengthA - k]};
 
-				result[n] <= result[n] + intA*intB;
+					result[n] <= result[n] + intA*intB;
 
-       	end else begin
-       		intA <= 32'b0;
-       		intB <= 32'b0;
-       		result <= result;
-       	end
+				end else begin
+					intA <= 8'b0;
+					intB <= 8'b0;
+					result <= result;
+				end
+		
+		end else begin
+			n <= lengthResult;
+			k <= 4'b0;
+			intA <= 8'b0;
+			intB <= 8'b0;
+			result <= '{3999{8'b0}};
 		end
+	end
 
     // Next state logic
     always_comb begin
-        case(state)
+        case(currentState)
             PROCESSING: nextstate = (n >= lengthResult)? DONE : PROCESSING; // Wait until counter 
             DONE: 		nextstate = DONE; // S1: Done processing
             default: nextstate = DONE;
         endcase
     end
+	 
+	 assign finished = (currentState == DONE);
 
 
 
