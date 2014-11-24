@@ -15,27 +15,23 @@ figure
 plot(conv(a,fliplr(b)))
 title('Result of xcorr with conv');
 
-%%
-fb = fliplr(b);
-result = zeros(2*length(a) - 1);
-for n=1
-    n
-    for k = 1:length(a)
-        k
-        if k <= length(a)
-            ca = a(k);
+%% DO NOT CHANGE THIS IS PERFECT %%
+result = zeros(2*length(a) - 1,1);
+for n=1:(2*length(a) - 1)
+    for k = 0:n-1
+        if n-k <= length(a)
+            ca = a(n-k);
         else
             ca = 0;
         end
         
-        if (n-k) <= length(fb)
-            cb = fb(k);
+        if ((length(b)-k) > 0)
+            cb = b(end-k);
         else
             cb = 0;
         end
         result(n)= result(n) + ca*cb
-        
-        n-k
+     
     end
 end
 
