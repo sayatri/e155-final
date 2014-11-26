@@ -250,7 +250,7 @@ void initADC(void) {
     AD1CON1bits.SAMP = 0;       // Don't start sampling upon initialization
 
     // AD1CON2: ADC Control Register 2
-    AD1CON2bits.VCFG = 1;  //' Voltage reference - Vr+ (external), Vr- (AVss)
+    AD1CON2bits.VCFG = 0b001;  //External VREF+ pin AVSS
     AD1CON2bits.OFFCAL = 0;     // disable offset calibration mode
     AD1CON2bits.CSCNA = 0;      // do not scan inputs for mux
     AD1CON2bits.BUFM = 1;       // 1 = two 8-word buffers, 0 = one 16-word buffer
@@ -262,16 +262,15 @@ void initADC(void) {
     AD1CON3bits.SAMC = 3;       // Time audio sample bits
     AD1CON3bits.ADCS = 0b10001110;    //ADC Conversion Clock Select (142)
  
-/*  Don't have these registers?
+// Don't have these registers?
     // AD1CHS: ADC Input Select Register
-    AD1CHS.CH0NA = 0;           // Channel 0 neg input is VR-
-    AD1CHS.CH0SA = 0;           // Channel 0 pos input is AN0
+    AD1CHS = 0b0001;		// Channel 0 positibe input is AN1
 
 	// TODO: Set TRISx to 1 
-*/
+
 
     // AD1PCFG: ADC Port Configuration Register
-    AD1PCFG = 0xFFFE;       // set AN0 as an analog input
+    AD1PCFG = 0xFFFC;       // set AN0, AN1 as an analog input
 
     // Interrupt, set when SMPI condition met
     IFS1CLR = 2;                 // clear the ADC conversion interrupt
