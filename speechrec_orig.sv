@@ -4,11 +4,7 @@
 // 
 // Receives an audio signal via SPI and compares it to audio signals stored in memory
 
-<<<<<<< HEAD
 module speechrec(input  logic       clk, sck, sdi, //ss,
-=======
-module speechrec(input  logic       clk, sck, sdi, ss,
->>>>>>> e6c5fc192b1a9d17e2344d3eb0ea8a4241f6d8c1
                  output logic       sdo,
                  output logic [7:0] led);
 

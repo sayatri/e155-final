@@ -24,6 +24,7 @@ This code:
 #include "GenericTypeDefs.h"
 #include <plib.h>
 #include <p32xxxx.h>
+#include <time.h>
 
 // *****************************************************************************
 // *****************************************************************************
@@ -35,7 +36,9 @@ This code:
 typedef enum _STATE
 {
     READY_TO_LISTEN,
-    LISTENING_SENDING,
+    LISTENING,
+    FILTERING,
+    TRANSMITTING,
     // processing states
     PROCESSING_DATA,
     // SENDING_DATA_TO_FPGAS,
@@ -61,20 +64,14 @@ typedef enum _STATE
 #define SARAH_FGPA          (0x0008) // SS = RD3
 
 // Macros for ADC Configuration
-
-// #define CONFIG1             (ADC_MODULE_OFF |   // Turns module off
-//                             ADC_IDLE_CONTINUE | // module continues in Idle Mode
-//                             ACD_FORMAT_INT16 |  // Data output integer 16-bit
-//                             ADC_CLK_MANUAL |    // Clearing SAMP bit ends sampling and starts conversion
-//                             ADC_AUTO_SAMPLING_ON |// Begins when SAMP bit is set
-//                             ADC_SAMP_OFF)       // ADC sample hold
-// #define CONFIG2             (ADC_SCAN_OFF |     // Scan select off
-//                             ADC_ALT_BUF_ON)     // Buffer configured as two 8-word buffers?????
-// #define CONFIG3             (ACD)CONV_CLK_SYSTEM)// Use PBCLK
+// #define CONFIG1             (ADC_MODULE_OFF | ADC_IDLE_CONTINUE | ADC_FORMAT_INT16 | ADC_CLK_MANUAL |ADC_AUTO_SAMPLING_ON |ADC_SAMP_OFF)       // ADC sample hold
+// #define CONFIG2             (ADC_SCAN_OFF | ADC_ALT_BUF_ON) 
+// #define CONFIG3              (ADC_CONV_CLK_SYSTEM) // Use PBCLK
 // #define CONFIGPORT          (ENABLE_AN0_ANA)    // AN0 in analog input pin mode in Analog mode
-// #define CONFIGSCAN          (SCAN_SCAN_AN0)     // Select AN0 for input scan
-// #define CHANNELCONFIG       (ADC_CH0_POS_SAMPLEA_AN0 | // Use AN0 for input
-//                            ADC_CH0_NEG_SAMPLEA_NVREF) /// Use ground as neg ref for AN0
+// #define CONFIGSCAN          (32'b0 & 32'b1)     // Select AN0 for input scan, skip rest
+
+//                             // use AN0 for input, use ground as neg ref for AN0
+// #define CHANNELCONFIG       (ADC_CH0_POS_SAMPLEA_AN0 | ADC_CH0_NEG_SAMPLEA_NVREF) 
 //#define TWOSEC              (0x?????) // TODO
 //)
                                                 
@@ -200,6 +197,200 @@ void getstrserial(char *str)
 	} while (str[i++] != '\r'); // look for return 
 	str[i-1] = 0;	// null terminate the string
 }
+
+//******************************************************************************
+//******************************************************************************
+// ADC
+//******************************************************************************
+//******************************************************************************
+
+// 5ksps for a system clock of 40 MHz, and PBCLKDIV = 2;
+
+// Calculate PB clock time (T_PB) + sample plus convert time
+//     T_PB = (1/40 MHz) * 2 = 50 ns
+//     1/(5ksps) = .2 ms + converttime
+
+// To calculate the ideal TAD. ADC min requirements for TAD.
+//     \frac{.2 ms}{12+1} = 15.385 us = TAD = desired ADC clock period
+
+// Double sample period to 2*TAD
+//     \frac{.2 ms}{12+2} = 14.2857 us = TAD
+//     2*TAD = 28.5814 us = sample time
+
+// Calculate ADC clock divisor value
+//     14.2857 ms/ (1/20Mhz) = 285.714; 
+//     --> 284 --> ADC = 141
+//     --> 286 --> ADC = 142
+
+// Calculate sample rate using ADCS divisors
+//     --> 284 --> \frac{1}{284*(12+2)*50ns} = 5030.181 sps
+//     --> 286 --> \frac{1}{286*(12+2)*50ns} = 4995.005 sps
+
+
+// Verify
+//     TPB = (1/40 MHz) * 2 = 50 ns
+//     TAD = 50 ns * 286 = 14.2 us
+//     TAD * 2 = 28.6 us = sampletime
+
+// Summary:
+//     ACD = 142; ADC clock is PB divided by 286
+//     SAMPC = 2; Sample time is 2 TAD periods 
+
+
+void initADC(void) {
+    
+    // ADC Control Register 1
+    AD1CON1bits.ON = 0; // ADC is off
+    AD1CON1bits.SIDL = 0; // Continue module operation in Idle mode
+    AD1CON1bits.FORM = 5; // ' Signed Integer 32-bit (DOUT = ssss ssss ssss ssss ssss sssd dddd dddd)
+    AD1CON1bits.SSRC = 7;       // End sampling and start conversion when SAMP bit cleared
+    AD1CON1bits.CLRASAM = 0;    // Buffer contents overwritten by next conversion sequence
+    AD1CON1bits.ASAM = 0;       //  Sampling begins immediately after last conversion completes; 
+                                // SAMP bit is automatically set
+    AD1CON1bits.SAMP = 0;       // Don't start sampling upon initialization
+
+    // AD1CON2: ADC Control Register 2
+    AD1CON2bits.VCFG = 1;  //' Voltage reference - Vr+ (external), Vr- (AVss)
+    AD1CON2bits.OFFCAL = 0;     // disable offset calibration mode
+    AD1CON2bits.CSCNA = 0;      // do not scan inputs for mux
+    AD1CON2bits.BUFM = 1;       // 1 = two 8-word buffers, 0 = one 16-word buffer
+    AD1CON2bits.ALTS = 0;       // Always use MUX A input settings
+	AD1CON2bits.SMPI = 7;        // Eight samples per interrupt
+
+    // AD1CON3: ADC Control Register 3
+    AD1CON3bits.ADRC = 0;       // Use PBCLK
+    AD1CON3bits.SAMC = 3;       // Time audio sample bits
+    AD1CON3bits.ADCS = 0b10001110;    //ADC Conversion Clock Select (142)
+ 
+/*  Don't have these registers?
+    // AD1CHS: ADC Input Select Register
+    AD1CHS.CH0NA = 0;           // Channel 0 neg input is VR-
+    AD1CHS.CH0SA = 0;           // Channel 0 pos input is AN0
+
+	// TODO: Set TRISx to 1 
+*/
+
+    // AD1PCFG: ADC Port Configuration Register
+    AD1PCFG = 0xFFFE;       // set AN0 as an analog input
+
+    // Interrupt, set when SMPI condition met
+    IFS1CLR = 2;                 // clear the ADC conversion interrupt
+    IEC1SET = 2;                 // Enable ADC conversion interrupt                
+}
+
+void ADC_off(void){
+    AD1CON1bits.ON = 0; // ADC is off
+}
+
+void ADC_on(void){
+    AD1CON1bits.ON = 1; // ADC is on
+}
+
+void delay(int milliseconds)
+{
+    long pause;
+    clock_t now,then;
+
+    pause = milliseconds*(CLOCKS_PER_SEC/1000);
+    now = then = clock();
+    while( (now-then) < pause )
+        now = clock();
+}
+
+void ADC_startManuAcq(void) {
+ 	delay(100);
+    AD1CON1bits.SAMP = 1;   // the ADC SHA is sampling
+}
+
+void ADC_startAutoAcq(void) {
+    delay(100);
+    AD1CON1bits.ASAM = 1;
+}
+
+// stops sampling and starts conversion
+void ADC_stopManuAcq(void) {
+    AD1CON1bits.SAMP = 0; // 
+}
+
+// ONLY VALID FOR MANUAL MODE
+// // return 1 when ADC conversion done
+// // return 0 when conversion not done or not started
+// char ADC_done(void) {
+//     return AD1CON1bits.DONE; 
+// }
+
+//Interrupts disabled
+// When the AD1IF flag is set, then....
+// and then clears the flag
+char ADC_getFlag(void) {
+    return (!IFS1 & 0x0002);
+}
+
+void ADC_clearFlag(void) {
+    IFS1CLR = 2; // clear interrupt
+}
+
+char ADC_done(void){
+	return AD1CON1bits.DONE;
+}
+// Only valid when BUFM = 1
+// 1 = ADC is currently filling buffer 0x8-0xF, user should access data in 0x0-0x7
+// 0 = ADC is currently filling buffer 0x0-0x7, user should access data in 0x8-0xF
+char ADC_bufferStatus(void) {
+    return AD1CON2bits.BUFS;
+}
+
+//Check ADC Audo-Sample Time Bits
+char ADC_sampleTime(void){
+    return AD1CON3bits.SAMC;
+}
+
+// Calibrate for offset
+short ADC_calibrateOffset(void){
+    ADC_off();
+    AD1CON2bits.OFFCAL = 1;
+
+    ADC_on();
+
+    ADC_startManuAcq();
+
+    delay(100); // wait .1 seconds;
+
+    ADC_stopManuAcq();
+
+
+    while(!ADC_done());     // check if conversion done
+   
+    int offset = ADC1BUF0;
+
+    ADC_off();              // Don't write to registers when ADC is on
+    AD1CON2bits.OFFCAL = 0; // clear calibration mode
+
+    return (short) offset;
+}
+
+
+//******************************************************************************
+//******************************************************************************
+// Timer
+//******************************************************************************
+//******************************************************************************
+
+void initTMR1(void){
+    T1CONbits.ON = 0; // disable timer for now
+    T1CONbits.TCKPS = 0b11;    // 256 prescaler value
+    T1CONbits.TCS = 0;      // Internal peripheral clock
+}
+
+void startTMR1(void){
+    T1CONbits.ON = 1;
+}
+
+void stopTMR1(void){
+    T1CONbits.ON = 0;
+}
+
+
 //******************************************************************************
 //******************************************************************************
 // Main
@@ -214,98 +405,148 @@ int main (void)
         unsigned char switches;
 		unsigned char switchBuffer;
         unsigned char enable;
-        unsigned int offset; // points to the base of the idle buffer
+        unsigned int  offset; // points to the base of the idle buffer
+        signed short ADC_offset;
         unsigned char audioData; // Connected to AN0
 		char str[80];
+        signed short rawAudio [2000];
+        short rawAudioIndex;
         
         initspi();
         initUART();
-		// initTMR2(); //???
+        initADC();
 
-        // Configure and enable the ADC
-		// CloseADC10();   // Ensure the ADC is off before setting
-                        // the configuration
-		// SetChanADC(CHANNELCONFIG); //Configure AN0 for input
-
-        // Configure ADC using parameters above
-		// OpenADC10(CONFIG1, CONFIG2, CONFIG3, CONFIGPORT, CONFIGSCAN);
-
-
-
-   
+        ADC_offset = ADC_calibrateOffset();
+           
         // set RD[7:0] to output, RD[11:8] to input
         //   RD[7:0] are LEDs
         //   RD[11:8] are switches
         TRISD = 0xFF00;
 
-        // set RE[0] to output - for pushbuttom1
+        // set RE[0] to input - for pushbutton enable
         // set RE[3:1] to output - for slave select
-        TRISE = 0x0000; 
+        TRISE = 0x0001; 
+
 
 
 
         printf("\nI am configured via UART correctly!\n");
         while(1) {
 			PORTE = SARAH_FGPA;
+            enable = PORTE;   // pushbutton enable
 		
-            switchBuffer = (PORTD >> 8) & 0x000F;
-			if (switchBuffer != switches){
-				switches = switchBuffer;
-    	      	PORTD = switches; // Read and mask RD[7:4]
-                                         // display on LED
-				printf("Switches are set to %d.\n", switches);
-			}
-		    
-          	receivedBUFFER = spi_send_receive(switchBuffer);
-//printf("Received this value from slave PIC: %d\n\n", receivedSPI);
-			if (receivedBUFFER != receivedSPI){
-				receivedSPI = receivedBUFFER;
-				PORTD = ((receivedSPI << 4 ) & 0x00F0 ) | switches;
-                printf("Received this value from slave PIC: %d\n\n", receivedSPI);
-			}
+// ---- insert successful SPI code ----- //
 
-            // switch(Master_State)
-            // {
-            //     case READY_TO_LISTEN:
-            //         // if pushbutton is pressed, then record audio
-            //         if (enable == 1) {
-            //             Master_State = LISTENING;
-            //         }
-            //         break;
+            switch(Master_State)
+            {
+                case READY_TO_LISTEN:
+                    // if pushbutton is pressed, then record audio
+                    if (enable == 1) {
+                        Master_State = LISTENING;
+                        printf("Current state: Ready to Listen\n");
+                    }
+                    break;
 
-            //     case LISTENING_SENDING:
-            //         EnableADC10(); // Enable the ADC
-            //         AcquireADC10(); // Starts manual sample mode
-                   
-            //         // Determine which buffer is idle and create an offset
-            //         // ReadActiveBufferADC10() = 0 when buffer locations
-            //         // 0-7 are being written to ACD module; = 1 when 
-            //         // locations 8-F are being written by the ADC module
+                case LISTENING:
+                    printf("Current state: Listening\n");
 
-            //         while(timer3 < 2SEC){ //TODO set a timer to count to 2sec
+                    startTMR1();
+                    ADC_on();
+                    ADC_startAutoAcq();
+
+                    while (TMR1 < 156250) {
+
+                        while( (!IFS1 & 0x0002)){   // Use interrupt flag check if conversion done
+
+    // 1 = ADC is currently filling buffer 0x8-0xF, user should access data in 0x0-0x7
+    // 0 = ADC is currently filling buffer 0x0-0x7, user should access data in 0x8-0xF
+
+                            if (ADC_bufferStatus()){
+                                // store value from 0x0 - 0x7
+                                rawAudio[rawAudioIndex] = (signed short) ADC1BUF0;
+                                rawAudio[rawAudioIndex + 1] = (signed short) ADC1BUF1;
+                                rawAudio[rawAudioIndex + 2] = (signed short) ADC1BUF2;
+                                rawAudio[rawAudioIndex + 3] = (signed short)ADC1BUF3;
+                                rawAudio[rawAudioIndex + 4] = (signed short) ADC1BUF4;
+                                rawAudio[rawAudioIndex + 5] = (signed short) ADC1BUF5;
+                                rawAudio[rawAudioIndex + 6] = (signed short) ADC1BUF6;
+                                rawAudio[rawAudioIndex + 7] = (signed short)ADC1BUF7;                               
+                            } else {
+                                // store value from 0x8-0xF
+                                rawAudio[rawAudioIndex] = (signed short) ADC1BUF8;
+                                rawAudio[rawAudioIndex + 1] = (signed short) ADC1BUF9;
+                                rawAudio[rawAudioIndex + 2] = (signed short) ADC1BUFA;
+                                rawAudio[rawAudioIndex + 3] = (signed short)ADC1BUFB;
+                                rawAudio[rawAudioIndex + 4] = (signed short) ADC1BUFC;
+                                rawAudio[rawAudioIndex + 5] = (signed short) ADC1BUFD;
+                                rawAudio[rawAudioIndex + 6] = (signed short) ADC1BUFE;
+                                rawAudio[rawAudioIndex + 7] = (signed short)ADC1BUFF;    
+                            }
+                            
+                            ADC_clearFlag();
+                            rawAudioIndex += 9;
+                        }
+                    }
+
+                    ADC_off();
+                    stopTMR1();
+
+                    if (ADC_bufferStatus()){
+                        // store value from 0x0 - 0x7
+                    } else {
+                        // store value from 0x8-0xF
+                    }
+                            
+
+
+
                     
-            //             offset = 8 * ((~ReadActiveBufferADC10() & 0x01));
+   
 
+                    Master_State = FILTERING;
 
-            //             // ReadADC10 returns int. Only want lower 8 bits
-            //             // for SPI transmit. ???????
-            //             audioData = (ReadADC10(offset) & 0xFF);
-            //             clearSPI = spi_send_receive(audioData);
-            //         }
+                    break;
+                case FILTERING:
+                    printf("You are done sampling");
+                    printf("Current state: Filtering\n");
+                    break;
 
-            //         CloseADC10(); //turns off ADC module
-            //         Master_State = PROCESSING_DATA;
+                case TRANSMITTING:
+                    printf("Current state: TRANSMITTING\n");
+                    break;
 
-            //         break;
+                case PROCESSING_DATA:
+                    break;
 
-            //     case PROCESSING_DATA:
-            //         break;
+                case COMPLETED_PROCESSING:
+                    break;
 
-            //     case COMPLETED_PROCESSING:
-            //         break;
-
-            //}
+            }
              
         }
 
 }
+
+
+// Successful SPI Code
+//-------------------------------------------------------------------------------
+   /*         
+
+            switchBuffer = (PORTD >> 8) & 0x000F;
+            if (switchBuffer != switches){
+                switches = switchBuffer;
+                PORTD = switches; // Read and mask RD[7:4]
+                                         // display on LED
+                printf("Switches are set to %d.\n", switches);
+            }
+            
+            receivedBUFFER = spi_send_receive(switchBuffer);
+            //printf("Received this value from slave PIC: %d\n\n", receivedSPI);
+            if (receivedBUFFER != receivedSPI){
+                receivedSPI = receivedBUFFER;
+                PORTD = ((receivedSPI << 4 ) & 0x00F0 ) | switches;
+                printf("Received this value from slave PIC: %d\n\n", receivedSPI);
+            }
+
+    */
+//-------------------------------------------------------------------------------
