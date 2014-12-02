@@ -1,4 +1,4 @@
-// Copyright (C) 1991-2013 Altera Corporation
+// Copyright (C) 1991-2012 Altera Corporation
 // Your use of Altera Corporation's design tools, logic functions 
 // and other software and tools, and its AMPP partner logic 
 // functions, and any output files from any of the foregoing 
@@ -13,10 +13,10 @@
 // applicable agreement for further details.
 
 // VENDOR "Altera"
-// PROGRAM "Quartus II 64-Bit"
-// VERSION "Version 13.1.0 Build 162 10/23/2013 SJ Web Edition"
+// PROGRAM "Quartus II 32-bit"
+// VERSION "Version 12.0 Build 178 05/31/2012 SJ Web Edition"
 
-// DATE "11/23/2014 22:17:02"
+// DATE "11/20/2014 23:55:42"
 
 // 
 // Device: Altera EP3C5E144C8 Package TQFP144
@@ -32,26 +32,19 @@ module speechrec (
 	clk,
 	sck,
 	sdi,
-	ss,
-	reset,
 	sdo,
 	led,
-	result);
+	rec_clk);
 input 	logic clk ;
 input 	logic sck ;
 input 	logic sdi ;
-input 	logic ss ;
-input 	logic reset ;
 output 	logic sdo ;
 output 	logic [7:0] led ;
-output 	logic [3:0] result ;
+output 	logic [3:0] rec_clk ;
 
 // Design Ports Information
 // clk	=>  Location: PIN_88,	 I/O Standard: 2.5 V,	 Current Strength: Default
-// sck	=>  Location: PIN_25,	 I/O Standard: 2.5 V,	 Current Strength: Default
 // sdi	=>  Location: PIN_24,	 I/O Standard: 2.5 V,	 Current Strength: Default
-// ss	=>  Location: PIN_55,	 I/O Standard: 2.5 V,	 Current Strength: Default
-// reset	=>  Location: PIN_10,	 I/O Standard: 2.5 V,	 Current Strength: Default
 // sdo	=>  Location: PIN_53,	 I/O Standard: 2.5 V,	 Current Strength: Default
 // led[0]	=>  Location: PIN_43,	 I/O Standard: 2.5 V,	 Current Strength: Default
 // led[1]	=>  Location: PIN_38,	 I/O Standard: 2.5 V,	 Current Strength: Default
@@ -61,10 +54,11 @@ output 	logic [3:0] result ;
 // led[5]	=>  Location: PIN_31,	 I/O Standard: 2.5 V,	 Current Strength: Default
 // led[6]	=>  Location: PIN_30,	 I/O Standard: 2.5 V,	 Current Strength: Default
 // led[7]	=>  Location: PIN_28,	 I/O Standard: 2.5 V,	 Current Strength: Default
-// result[0]	=>  Location: PIN_137,	 I/O Standard: 2.5 V,	 Current Strength: Default
-// result[1]	=>  Location: PIN_69,	 I/O Standard: 2.5 V,	 Current Strength: Default
-// result[2]	=>  Location: PIN_80,	 I/O Standard: 2.5 V,	 Current Strength: Default
-// result[3]	=>  Location: PIN_99,	 I/O Standard: 2.5 V,	 Current Strength: Default
+// rec_clk[0]	=>  Location: PIN_65,	 I/O Standard: 2.5 V,	 Current Strength: Default
+// rec_clk[1]	=>  Location: PIN_66,	 I/O Standard: 2.5 V,	 Current Strength: Default
+// rec_clk[2]	=>  Location: PIN_67,	 I/O Standard: 2.5 V,	 Current Strength: Default
+// rec_clk[3]	=>  Location: PIN_68,	 I/O Standard: 2.5 V,	 Current Strength: Default
+// sck	=>  Location: PIN_25,	 I/O Standard: 2.5 V,	 Current Strength: Default
 
 
 wire gnd;
@@ -83,10 +77,7 @@ initial $sdf_annotate("speechrec_min_1200mv_0c_v_fast.sdo");
 // synopsys translate_on
 
 wire \clk~input_o ;
-wire \sck~input_o ;
 wire \sdi~input_o ;
-wire \ss~input_o ;
-wire \reset~input_o ;
 wire \sdo~output_o ;
 wire \led[0]~output_o ;
 wire \led[1]~output_o ;
@@ -96,10 +87,17 @@ wire \led[4]~output_o ;
 wire \led[5]~output_o ;
 wire \led[6]~output_o ;
 wire \led[7]~output_o ;
-wire \result[0]~output_o ;
-wire \result[1]~output_o ;
-wire \result[2]~output_o ;
-wire \result[3]~output_o ;
+wire \rec_clk[0]~output_o ;
+wire \rec_clk[1]~output_o ;
+wire \rec_clk[2]~output_o ;
+wire \rec_clk[3]~output_o ;
+wire \sck~input_o ;
+wire \sck~inputclkctrl_outclk ;
+wire \receiver|count~2_combout ;
+wire \receiver|count~3_combout ;
+wire \receiver|count~0_combout ;
+wire \receiver|count~1_combout ;
+wire [3:0] \receiver|count ;
 
 
 // Location: IOOBUF_X16_Y0_N2
@@ -130,7 +128,7 @@ defparam \led[0]~output .open_drain_output = "false";
 
 // Location: IOOBUF_X1_Y0_N23
 cycloneiii_io_obuf \led[1]~output (
-	.i(gnd),
+	.i(vcc),
 	.oe(vcc),
 	.seriesterminationcontrol(16'b0000000000000000),
 	.devoe(devoe),
@@ -156,7 +154,7 @@ defparam \led[2]~output .open_drain_output = "false";
 
 // Location: IOOBUF_X0_Y6_N23
 cycloneiii_io_obuf \led[3]~output (
-	.i(gnd),
+	.i(vcc),
 	.oe(vcc),
 	.seriesterminationcontrol(16'b0000000000000000),
 	.devoe(devoe),
@@ -219,66 +217,56 @@ defparam \led[7]~output .bus_hold = "false";
 defparam \led[7]~output .open_drain_output = "false";
 // synopsys translate_on
 
-// Location: IOOBUF_X7_Y24_N2
-cycloneiii_io_obuf \result[0]~output (
-	.i(gnd),
+// Location: IOOBUF_X28_Y0_N23
+cycloneiii_io_obuf \rec_clk[0]~output (
+	.i(\receiver|count [0]),
 	.oe(vcc),
 	.seriesterminationcontrol(16'b0000000000000000),
 	.devoe(devoe),
-	.o(\result[0]~output_o ),
+	.o(\rec_clk[0]~output_o ),
 	.obar());
 // synopsys translate_off
-defparam \result[0]~output .bus_hold = "false";
-defparam \result[0]~output .open_drain_output = "false";
+defparam \rec_clk[0]~output .bus_hold = "false";
+defparam \rec_clk[0]~output .open_drain_output = "false";
 // synopsys translate_on
 
-// Location: IOOBUF_X30_Y0_N2
-cycloneiii_io_obuf \result[1]~output (
-	.i(vcc),
+// Location: IOOBUF_X28_Y0_N2
+cycloneiii_io_obuf \rec_clk[1]~output (
+	.i(\receiver|count [1]),
 	.oe(vcc),
 	.seriesterminationcontrol(16'b0000000000000000),
 	.devoe(devoe),
-	.o(\result[1]~output_o ),
+	.o(\rec_clk[1]~output_o ),
 	.obar());
 // synopsys translate_off
-defparam \result[1]~output .bus_hold = "false";
-defparam \result[1]~output .open_drain_output = "false";
+defparam \rec_clk[1]~output .bus_hold = "false";
+defparam \rec_clk[1]~output .open_drain_output = "false";
 // synopsys translate_on
 
-// Location: IOOBUF_X34_Y7_N9
-cycloneiii_io_obuf \result[2]~output (
-	.i(gnd),
+// Location: IOOBUF_X30_Y0_N23
+cycloneiii_io_obuf \rec_clk[2]~output (
+	.i(\receiver|count [2]),
 	.oe(vcc),
 	.seriesterminationcontrol(16'b0000000000000000),
 	.devoe(devoe),
-	.o(\result[2]~output_o ),
+	.o(\rec_clk[2]~output_o ),
 	.obar());
 // synopsys translate_off
-defparam \result[2]~output .bus_hold = "false";
-defparam \result[2]~output .open_drain_output = "false";
+defparam \rec_clk[2]~output .bus_hold = "false";
+defparam \rec_clk[2]~output .open_drain_output = "false";
 // synopsys translate_on
 
-// Location: IOOBUF_X34_Y17_N16
-cycloneiii_io_obuf \result[3]~output (
-	.i(vcc),
+// Location: IOOBUF_X30_Y0_N9
+cycloneiii_io_obuf \rec_clk[3]~output (
+	.i(\receiver|count [3]),
 	.oe(vcc),
 	.seriesterminationcontrol(16'b0000000000000000),
 	.devoe(devoe),
-	.o(\result[3]~output_o ),
+	.o(\rec_clk[3]~output_o ),
 	.obar());
 // synopsys translate_off
-defparam \result[3]~output .bus_hold = "false";
-defparam \result[3]~output .open_drain_output = "false";
-// synopsys translate_on
-
-// Location: IOIBUF_X34_Y12_N22
-cycloneiii_io_ibuf \clk~input (
-	.i(clk),
-	.ibar(gnd),
-	.o(\clk~input_o ));
-// synopsys translate_off
-defparam \clk~input .bus_hold = "false";
-defparam \clk~input .simulate_z_as = "z";
+defparam \rec_clk[3]~output .bus_hold = "false";
+defparam \rec_clk[3]~output .open_drain_output = "false";
 // synopsys translate_on
 
 // Location: IOIBUF_X0_Y11_N22
@@ -291,6 +279,173 @@ defparam \sck~input .bus_hold = "false";
 defparam \sck~input .simulate_z_as = "z";
 // synopsys translate_on
 
+// Location: CLKCTRL_G3
+cycloneiii_clkctrl \sck~inputclkctrl (
+	.ena(vcc),
+	.inclk({vcc,vcc,vcc,\sck~input_o }),
+	.clkselect(2'b00),
+	.devclrn(devclrn),
+	.devpor(devpor),
+	.outclk(\sck~inputclkctrl_outclk ));
+// synopsys translate_off
+defparam \sck~inputclkctrl .clock_type = "global clock";
+defparam \sck~inputclkctrl .ena_register_mode = "none";
+// synopsys translate_on
+
+// Location: LCCOMB_X29_Y1_N20
+cycloneiii_lcell_comb \receiver|count~2 (
+// Equation(s):
+// \receiver|count~2_combout  = (!\receiver|count [3] & (\receiver|count [2] $ (((\receiver|count [1] & \receiver|count [0])))))
+
+	.dataa(\receiver|count [1]),
+	.datab(\receiver|count [3]),
+	.datac(\receiver|count [2]),
+	.datad(\receiver|count [0]),
+	.cin(gnd),
+	.combout(\receiver|count~2_combout ),
+	.cout());
+// synopsys translate_off
+defparam \receiver|count~2 .lut_mask = 16'h1230;
+defparam \receiver|count~2 .sum_lutc_input = "datac";
+// synopsys translate_on
+
+// Location: FF_X29_Y1_N21
+dffeas \receiver|count[2] (
+	.clk(\sck~inputclkctrl_outclk ),
+	.d(\receiver|count~2_combout ),
+	.asdata(vcc),
+	.clrn(vcc),
+	.aload(gnd),
+	.sclr(gnd),
+	.sload(gnd),
+	.ena(vcc),
+	.devclrn(devclrn),
+	.devpor(devpor),
+	.q(\receiver|count [2]),
+	.prn(vcc));
+// synopsys translate_off
+defparam \receiver|count[2] .is_wysiwyg = "true";
+defparam \receiver|count[2] .power_up = "low";
+// synopsys translate_on
+
+// Location: LCCOMB_X29_Y1_N18
+cycloneiii_lcell_comb \receiver|count~3 (
+// Equation(s):
+// \receiver|count~3_combout  = (\receiver|count [1] & (\receiver|count [0] & (!\receiver|count [3] & \receiver|count [2])))
+
+	.dataa(\receiver|count [1]),
+	.datab(\receiver|count [0]),
+	.datac(\receiver|count [3]),
+	.datad(\receiver|count [2]),
+	.cin(gnd),
+	.combout(\receiver|count~3_combout ),
+	.cout());
+// synopsys translate_off
+defparam \receiver|count~3 .lut_mask = 16'h0800;
+defparam \receiver|count~3 .sum_lutc_input = "datac";
+// synopsys translate_on
+
+// Location: FF_X29_Y1_N19
+dffeas \receiver|count[3] (
+	.clk(\sck~inputclkctrl_outclk ),
+	.d(\receiver|count~3_combout ),
+	.asdata(vcc),
+	.clrn(vcc),
+	.aload(gnd),
+	.sclr(gnd),
+	.sload(gnd),
+	.ena(vcc),
+	.devclrn(devclrn),
+	.devpor(devpor),
+	.q(\receiver|count [3]),
+	.prn(vcc));
+// synopsys translate_off
+defparam \receiver|count[3] .is_wysiwyg = "true";
+defparam \receiver|count[3] .power_up = "low";
+// synopsys translate_on
+
+// Location: LCCOMB_X29_Y1_N0
+cycloneiii_lcell_comb \receiver|count~0 (
+// Equation(s):
+// \receiver|count~0_combout  = (!\receiver|count [0] & !\receiver|count [3])
+
+	.dataa(gnd),
+	.datab(gnd),
+	.datac(\receiver|count [0]),
+	.datad(\receiver|count [3]),
+	.cin(gnd),
+	.combout(\receiver|count~0_combout ),
+	.cout());
+// synopsys translate_off
+defparam \receiver|count~0 .lut_mask = 16'h000F;
+defparam \receiver|count~0 .sum_lutc_input = "datac";
+// synopsys translate_on
+
+// Location: FF_X29_Y1_N1
+dffeas \receiver|count[0] (
+	.clk(\sck~inputclkctrl_outclk ),
+	.d(\receiver|count~0_combout ),
+	.asdata(vcc),
+	.clrn(vcc),
+	.aload(gnd),
+	.sclr(gnd),
+	.sload(gnd),
+	.ena(vcc),
+	.devclrn(devclrn),
+	.devpor(devpor),
+	.q(\receiver|count [0]),
+	.prn(vcc));
+// synopsys translate_off
+defparam \receiver|count[0] .is_wysiwyg = "true";
+defparam \receiver|count[0] .power_up = "low";
+// synopsys translate_on
+
+// Location: LCCOMB_X29_Y1_N10
+cycloneiii_lcell_comb \receiver|count~1 (
+// Equation(s):
+// \receiver|count~1_combout  = (!\receiver|count [3] & (\receiver|count [1] $ (\receiver|count [0])))
+
+	.dataa(gnd),
+	.datab(\receiver|count [3]),
+	.datac(\receiver|count [1]),
+	.datad(\receiver|count [0]),
+	.cin(gnd),
+	.combout(\receiver|count~1_combout ),
+	.cout());
+// synopsys translate_off
+defparam \receiver|count~1 .lut_mask = 16'h0330;
+defparam \receiver|count~1 .sum_lutc_input = "datac";
+// synopsys translate_on
+
+// Location: FF_X29_Y1_N11
+dffeas \receiver|count[1] (
+	.clk(\sck~inputclkctrl_outclk ),
+	.d(\receiver|count~1_combout ),
+	.asdata(vcc),
+	.clrn(vcc),
+	.aload(gnd),
+	.sclr(gnd),
+	.sload(gnd),
+	.ena(vcc),
+	.devclrn(devclrn),
+	.devpor(devpor),
+	.q(\receiver|count [1]),
+	.prn(vcc));
+// synopsys translate_off
+defparam \receiver|count[1] .is_wysiwyg = "true";
+defparam \receiver|count[1] .power_up = "low";
+// synopsys translate_on
+
+// Location: IOIBUF_X34_Y12_N22
+cycloneiii_io_ibuf \clk~input (
+	.i(clk),
+	.ibar(gnd),
+	.o(\clk~input_o ));
+// synopsys translate_off
+defparam \clk~input .bus_hold = "false";
+defparam \clk~input .simulate_z_as = "z";
+// synopsys translate_on
+
 // Location: IOIBUF_X0_Y11_N15
 cycloneiii_io_ibuf \sdi~input (
 	.i(sdi),
@@ -299,26 +454,6 @@ cycloneiii_io_ibuf \sdi~input (
 // synopsys translate_off
 defparam \sdi~input .bus_hold = "false";
 defparam \sdi~input .simulate_z_as = "z";
-// synopsys translate_on
-
-// Location: IOIBUF_X18_Y0_N15
-cycloneiii_io_ibuf \ss~input (
-	.i(ss),
-	.ibar(gnd),
-	.o(\ss~input_o ));
-// synopsys translate_off
-defparam \ss~input .bus_hold = "false";
-defparam \ss~input .simulate_z_as = "z";
-// synopsys translate_on
-
-// Location: IOIBUF_X0_Y18_N15
-cycloneiii_io_ibuf \reset~input (
-	.i(reset),
-	.ibar(gnd),
-	.o(\reset~input_o ));
-// synopsys translate_off
-defparam \reset~input .bus_hold = "false";
-defparam \reset~input .simulate_z_as = "z";
 // synopsys translate_on
 
 assign sdo = \sdo~output_o ;
@@ -339,12 +474,12 @@ assign led[6] = \led[6]~output_o ;
 
 assign led[7] = \led[7]~output_o ;
 
-assign result[0] = \result[0]~output_o ;
+assign rec_clk[0] = \rec_clk[0]~output_o ;
 
-assign result[1] = \result[1]~output_o ;
+assign rec_clk[1] = \rec_clk[1]~output_o ;
 
-assign result[2] = \result[2]~output_o ;
+assign rec_clk[2] = \rec_clk[2]~output_o ;
 
-assign result[3] = \result[3]~output_o ;
+assign rec_clk[3] = \rec_clk[3]~output_o ;
 
 endmodule
