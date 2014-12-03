@@ -176,12 +176,7 @@ void initUART(void)
 
 
 
-// Configure Timer Type B
-//void initTMR2(void){
-//    T1CONbits.ON = 1; // turn timer on
-//    T1CONbits.TCKPS = 7; // prescale value is 256
-//    T1CONbits.TCS = 0; // Use internal peripheral clock
-//}
+
 char getcharserial(void) 
 { 
 	while (!U2STAbits.URXDA); 	// wait until data available
@@ -238,19 +233,33 @@ void getstrserial(char *str)
 
 
 void initADC(void) {
-    
+    /*
+	
+	
+	011 = Signed Fractional 16-bit (DOUT = 0000 0000 0000 0000 sddd dddd dd00 0000)
+	010 = Fractional 16-bit (DOUT = 0000 0000 0000 0000 dddd dddd dd00 0000)
+	001 = Signed Integer 16-bit (DOUT = 0000 0000 0000 0000 ssss sssd dddd dddd)
+	000 = Integer 16-bit (DOUT = 0000 0000 0000 0000 0000 00dd dddd dddd)
+	111 = Signed Fractional 32-bit (DOUT = sddd dddd dd00 0000 0000 0000 0000)
+	110 = Fractional 32-bit (DOUT = dddd dddd dd00 0000 0000 0000 0000 0000)
+	101 = Signed Integer 32-bit (DOUT = ssss ssss ssss ssss ssss sssd dddd dddd)
+	100 = Integer 32-bit (DOUT = 0000 0000 0000 0000 0000 00dd dddd dddd)
+	
+	
+	
+	*/
     // ADC Control Register 1
     AD1CON1bits.ON = 0; // ADC is off
     AD1CON1bits.SIDL = 0; // Continue module operation in Idle mode
-    AD1CON1bits.FORM = 5; // ' Signed Integer 32-bit (DOUT = ssss ssss ssss ssss ssss sssd dddd dddd)
-    AD1CON1bits.SSRC = 7;       // End sampling and start conversion when SAMP bit cleared
+    AD1CON1bits.FORM = 0b100; // ' Signed Integer 32-bit (DOUT = ssss ssss ssss ssss ssss sssd dddd dddd)
+    AD1CON1bits.SSRC = 0b111;       // End sampling and start conversion when SAMP bit cleared
     AD1CON1bits.CLRASAM = 0;    // Buffer contents overwritten by next conversion sequence
     AD1CON1bits.ASAM = 0;       //  Sampling begins immediately after last conversion completes; 
                                 // SAMP bit is automatically set
     AD1CON1bits.SAMP = 0;       // Don't start sampling upon initialization
 
     // AD1CON2: ADC Control Register 2
-    AD1CON2bits.VCFG = 0b001;  //External VREF+ pin AVSS
+    AD1CON2bits.VCFG = 0;  // In voltage reference
     AD1CON2bits.OFFCAL = 0;     // disable offset calibration mode
     AD1CON2bits.CSCNA = 0;      // do not scan inputs for mux
     AD1CON2bits.BUFM = 1;       // 1 = two 8-word buffers, 0 = one 16-word buffer
@@ -259,18 +268,19 @@ void initADC(void) {
 
     // AD1CON3: ADC Control Register 3
     AD1CON3bits.ADRC = 0;       // Use PBCLK
-    AD1CON3bits.SAMC = 3;       // Time audio sample bits
+    AD1CON3bits.SAMC = 3;      		 // Time audio sample bits
     AD1CON3bits.ADCS = 0b10001110;    //ADC Conversion Clock Select (142)
  
 // Don't have these registers?
     // AD1CHS: ADC Input Select Register
-    AD1CHS = 0b0001;		// Channel 0 positibe input is AN1
+     AD1CHS = 0x00020000; // Connect RB2/AN2 as CH0 input
+							// in this example RB2/AN2 is the input
 
 	// TODO: Set TRISx to 1 
 
 
     // AD1PCFG: ADC Port Configuration Register
-    AD1PCFG = 0xFFFC;       // set AN0, AN1 as an analog input
+    AD1PCFG = 0xFFFB; // PORTB = Digital; RB2 = analog
 
     // Interrupt, set when SMPI condition met
     IFS1CLR = 2;                 // clear the ADC conversion interrupt
@@ -311,12 +321,8 @@ void ADC_stopManuAcq(void) {
     AD1CON1bits.SAMP = 0; // 
 }
 
-// ONLY VALID FOR MANUAL MODE
-// // return 1 when ADC conversion done
-// // return 0 when conversion not done or not started
-// char ADC_done(void) {
-//     return AD1CON1bits.DONE; 
-// }
+
+
 
 //Interrupts disabled
 // When the AD1IF flag is set, then....
@@ -329,6 +335,7 @@ void ADC_clearFlag(void) {
     IFS1CLR = 2; // clear interrupt
 }
 
+// ONLY VALID FOR MANUAL MODE
 char ADC_done(void){
 	return AD1CON1bits.DONE;
 }
@@ -369,24 +376,32 @@ short ADC_calibrateOffset(void){
 }
 
 
+
+
 //******************************************************************************
 //******************************************************************************
 // Timer
 //******************************************************************************
 //******************************************************************************
 
-void initTMR1(void){
-    T1CONbits.ON = 0; // disable timer for now
-    T1CONbits.TCKPS = 0b11;    // 256 prescaler value
-    T1CONbits.TCS = 0;      // Internal peripheral clock
+void initTMR45(void){
+	T4CON = 0x0; // Stop any 16/32-bit Timer4 operation
+	T5CON = 0x0; // Stop any 16-bit Timer5 operation
+	T4CONbits.TCKPS = 0b111;	// 256 prescaler
+	T4CONbits.T32 = 1;
+	TMR4 = 0x0; // Clear contents of the TMR4 and TMR5
+	PR4 = 0xFFFFFFFF; // Load PR4 and PR5 registers with 32-bit value
+
 }
 
-void startTMR1(void){
-    T1CONbits.ON = 1;
+void startTMR45(void){
+    T4CONbits.ON = 1;
+	T5CONbits.ON = 1;
 }
 
-void stopTMR1(void){
-    T1CONbits.ON = 0;
+void stopTMR45(void){
+    T4CONbits.ON = 0;
+	T5CONbits.ON = 0;
 }
 
 
@@ -408,12 +423,13 @@ int main (void)
         signed short ADC_offset;
         unsigned char audioData; // Connected to AN0
 		char str[80];
-        signed short rawAudio [2000];
-        short rawAudioIndex;
+        unsigned int rawAudio [3000];
+        short rawAudioIndex = 0;
         
         initspi();
         initUART();
         initADC();
+		initTMR45();
 
         ADC_offset = ADC_calibrateOffset();
            
@@ -422,20 +438,27 @@ int main (void)
         //   RD[11:8] are switches
         TRISD = 0xFF00;
 
-        // set RE[0] to input - for pushbutton enable
-        // set RE[3:1] to output - for slave select
+        // set RE[0] = 1 to input - for pushbutton enable
+        // set RE[3:1] = 0to output - for slave select
+		// set RB[4] = 0 for output for counter
         TRISE = 0x0001; 
 
+		// set RB[7] = 1 for analog inputs
+		TRISB = 0xFFFF;
 
+		
 
 
         printf("\nI am configured via UART correctly!\n");
-        while(1) {
+
+		startTMR45();
+	
+       while(1) {
 			PORTE = SARAH_FGPA;
-            enable = PORTE;   // pushbutton enable
+            enable = PORTE & 0x0001;   // pushbutton enable
 		
 // ---- insert successful SPI code ----- //
-
+			if (Master_State == FILTERING) break;
             switch(Master_State)
             {
                 case READY_TO_LISTEN:
@@ -449,59 +472,73 @@ int main (void)
                 case LISTENING:
                     printf("Current state: Listening\n");
 
-                    startTMR1();
+                    startTMR45();
                     ADC_on();
                     ADC_startAutoAcq();
 
-                    while (TMR1 < 156250) {
+					while ((TMR5 << 16 | TMR4) < 156250) {
+					//	printf("inside TMR45 loop and TMR45 is %i ms\n", ((TMR5 << 16 | TMR4)/78));	
 
-                        while( (!IFS1 & 0x0002)){   // Use interrupt flag check if conversion done
+                        while (!IFS1 & 0x0002); // conversion done?
+								
+						if (ADC_bufferStatus()){
+					//		printf("inside if statement\n"); 
+							rawAudio[rawAudioIndex] = ADC1BUF0;
+						//	printf("buffer0 is %u\n", ADC1BUF0);
+						} else {
+					//		printf("inside else statement\n");
+							rawAudio[rawAudioIndex] = ADC1BUF8;
+						//	printf("buffer8 is %u\n", ADC1BUF9);
+						}
+					//	printf("index is %u\n", rawAudioIndex++);
+						
+						printf("%d\n", rawAudio[rawAudioIndex]);
+						
+						// 1 = ADC is currently filling buffer 0x8-0xF, user should access data in 0x0-0x7
+						// 0 = ADC is currently filling buffer 0x0-0x7, user should access data in 0x8-0xF
+						/*if (ADC_bufferStatus()){
+							// store value from 0x0 - 0x7
+						
+							rawAudio[rawAudioIndex] = (signed short) ADC1BUF0;
+							rawAudio[rawAudioIndex + 1] = (signed short) ADC1BUF1;
+							rawAudio[rawAudioIndex + 2] = (signed short) ADC1BUF2;
+							rawAudio[rawAudioIndex + 3] = (signed short)ADC1BUF3;
+							rawAudio[rawAudioIndex + 4] = (signed short) ADC1BUF4;
+							rawAudio[rawAudioIndex + 5] = (signed short) ADC1BUF5;
+							rawAudio[rawAudioIndex + 6] = (signed short) ADC1BUF6;
+							rawAudio[rawAudioIndex + 7] = (signed short)ADC1BUF7;     
 
-    // 1 = ADC is currently filling buffer 0x8-0xF, user should access data in 0x0-0x7
-    // 0 = ADC is currently filling buffer 0x0-0x7, user should access data in 0x8-0xF
+						
 
-                            if (ADC_bufferStatus()){
-                                // store value from 0x0 - 0x7
-                                rawAudio[rawAudioIndex] = (signed short) ADC1BUF0;
-                                rawAudio[rawAudioIndex + 1] = (signed short) ADC1BUF1;
-                                rawAudio[rawAudioIndex + 2] = (signed short) ADC1BUF2;
-                                rawAudio[rawAudioIndex + 3] = (signed short)ADC1BUF3;
-                                rawAudio[rawAudioIndex + 4] = (signed short) ADC1BUF4;
-                                rawAudio[rawAudioIndex + 5] = (signed short) ADC1BUF5;
-                                rawAudio[rawAudioIndex + 6] = (signed short) ADC1BUF6;
-                                rawAudio[rawAudioIndex + 7] = (signed short)ADC1BUF7;                               
-                            } else {
-                                // store value from 0x8-0xF
-                                rawAudio[rawAudioIndex] = (signed short) ADC1BUF8;
-                                rawAudio[rawAudioIndex + 1] = (signed short) ADC1BUF9;
-                                rawAudio[rawAudioIndex + 2] = (signed short) ADC1BUFA;
-                                rawAudio[rawAudioIndex + 3] = (signed short)ADC1BUFB;
-                                rawAudio[rawAudioIndex + 4] = (signed short) ADC1BUFC;
-                                rawAudio[rawAudioIndex + 5] = (signed short) ADC1BUFD;
-                                rawAudio[rawAudioIndex + 6] = (signed short) ADC1BUFE;
-                                rawAudio[rawAudioIndex + 7] = (signed short)ADC1BUFF;    
-                            }
-                            
-                            ADC_clearFlag();
-                            rawAudioIndex += 9;
-                        }
+						} else {
+							// store value from 0x8-0xF
+							rawAudio[rawAudioIndex] = (signed short) ADC1BUF8;
+							rawAudio[rawAudioIndex + 1] = (signed short) ADC1BUF9;
+							rawAudio[rawAudioIndex + 2] = (signed short) ADC1BUFA;
+							rawAudio[rawAudioIndex + 3] = (signed short)ADC1BUFB;
+							rawAudio[rawAudioIndex + 4] = (signed short) ADC1BUFC;
+							rawAudio[rawAudioIndex + 5] = (signed short) ADC1BUFD;
+							rawAudio[rawAudioIndex + 6] = (signed short) ADC1BUFE;
+							rawAudio[rawAudioIndex + 7] = (signed short)ADC1BUFF;   
+
+						}
+
+						printf("Got raw data from ADC: %d\n", rawAudio[rawAudioIndex]);
+						printf("Got raw data from ADC: %d\n", rawAudio[rawAudioIndex+1]);
+						printf("Got raw data from ADC: %d\n", rawAudio[rawAudioIndex+2]);
+						printf("Got raw data from ADC: %d\n", rawAudio[rawAudioIndex+3]);
+						printf("Got raw data from ADC: %d\n", rawAudio[rawAudioIndex+4]);
+						printf("Got raw data from ADC: %d\n", rawAudio[rawAudioIndex+5]);
+						printf("Got raw data from ADC: %d\n", rawAudio[rawAudioIndex+6]);
+						printf("Got raw data from ADC: %d\n", rawAudio[rawAudioIndex+7]);
+						*/
+						ADC_clearFlag();
+						rawAudioIndex += 9;
+					
                     }
-
+           			
                     ADC_off();
-                    stopTMR1();
-
-                    if (ADC_bufferStatus()){
-                        // store value from 0x0 - 0x7
-                    } else {
-                        // store value from 0x8-0xF
-                    }
-                            
-
-
-
-                    
-   
-
+                    stopTMR45();        
                     Master_State = FILTERING;
 
                     break;
@@ -522,7 +559,7 @@ int main (void)
 
             }
              
-        }
+        } 
 
 }
 
