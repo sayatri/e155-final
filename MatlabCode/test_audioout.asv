@@ -1,0 +1,9 @@
+audioOut = xlsread('audioout.xlsx', 'A1:A4000');
+
+modAudio = .5 - audioOut./1024;
+
+plot(audioOut);
+
+figure
+plot(modAudio);
+sound(modAudio, 

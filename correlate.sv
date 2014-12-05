@@ -10,8 +10,8 @@
 // assuming everything can be written as arrays
 module correlate(input  logic[2:0] state,
 				input logic		clk,
-				input byte		a[1999:0], b[1999:0],
-				output byte 	result[3998:0],
+				input logic[9:0]	a[1999:0], b[1999:0],
+				output logic[9:0] 	result[3998:0],
 				output logic 	finished);
 
 	typedef enum logic {PROCESSING=1'b0, DONE=1'b1} statetype;
