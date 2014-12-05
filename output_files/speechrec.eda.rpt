@@ -1,5 +1,5 @@
 EDA Netlist Writer report for speechrec
-Thu Nov 20 23:55:42 2014
+Mon Dec 01 22:29:12 2014
 Quartus II 32-bit Version 12.0 Build 178 05/31/2012 SJ Web Edition
 
 
@@ -36,7 +36,7 @@ applicable agreement for further details.
 +-------------------------------------------------------------------+
 ; EDA Netlist Writer Summary                                        ;
 +---------------------------+---------------------------------------+
-; EDA Netlist Writer Status ; Successful - Thu Nov 20 23:55:42 2014 ;
+; EDA Netlist Writer Status ; Successful - Mon Dec 01 22:29:12 2014 ;
 ; Revision Name             ; speechrec                             ;
 ; Top-level Entity Name     ; speechrec                             ;
 ; Family                    ; Cyclone III                           ;
@@ -66,20 +66,20 @@ applicable agreement for further details.
 +---------------------------------------------------------------------------------------------------+---------------------------------+
 
 
-+---------------------------------------------------------------------------------------------------------------------------------------+
-; Simulation Generated Files                                                                                                            ;
-+---------------------------------------------------------------------------------------------------------------------------------------+
-; Generated Files                                                                                                                       ;
-+---------------------------------------------------------------------------------------------------------------------------------------+
-; C:/Users/strisorus/Downloads/e155-finalproject-master/e155-finalproject-master/simulation/modelsim/speechrec_8_1200mv_85c_slow.svo    ;
-; C:/Users/strisorus/Downloads/e155-finalproject-master/e155-finalproject-master/simulation/modelsim/speechrec_8_1200mv_0c_slow.svo     ;
-; C:/Users/strisorus/Downloads/e155-finalproject-master/e155-finalproject-master/simulation/modelsim/speechrec_min_1200mv_0c_fast.svo   ;
-; C:/Users/strisorus/Downloads/e155-finalproject-master/e155-finalproject-master/simulation/modelsim/speechrec.svo                      ;
-; C:/Users/strisorus/Downloads/e155-finalproject-master/e155-finalproject-master/simulation/modelsim/speechrec_8_1200mv_85c_v_slow.sdo  ;
-; C:/Users/strisorus/Downloads/e155-finalproject-master/e155-finalproject-master/simulation/modelsim/speechrec_8_1200mv_0c_v_slow.sdo   ;
-; C:/Users/strisorus/Downloads/e155-finalproject-master/e155-finalproject-master/simulation/modelsim/speechrec_min_1200mv_0c_v_fast.sdo ;
-; C:/Users/strisorus/Downloads/e155-finalproject-master/e155-finalproject-master/simulation/modelsim/speechrec_v.sdo                    ;
-+---------------------------------------------------------------------------------------------------------------------------------------+
++-----------------------------------------------------------------------------------------------------------------------------+
+; Simulation Generated Files                                                                                                  ;
++-----------------------------------------------------------------------------------------------------------------------------+
+; Generated Files                                                                                                             ;
++-----------------------------------------------------------------------------------------------------------------------------+
+; C:/Users/strisorus/Downloads/e155-final-master (1)/e155-final-master/simulation/modelsim/speechrec_8_1200mv_85c_slow.svo    ;
+; C:/Users/strisorus/Downloads/e155-final-master (1)/e155-final-master/simulation/modelsim/speechrec_8_1200mv_0c_slow.svo     ;
+; C:/Users/strisorus/Downloads/e155-final-master (1)/e155-final-master/simulation/modelsim/speechrec_min_1200mv_0c_fast.svo   ;
+; C:/Users/strisorus/Downloads/e155-final-master (1)/e155-final-master/simulation/modelsim/speechrec.svo                      ;
+; C:/Users/strisorus/Downloads/e155-final-master (1)/e155-final-master/simulation/modelsim/speechrec_8_1200mv_85c_v_slow.sdo  ;
+; C:/Users/strisorus/Downloads/e155-final-master (1)/e155-final-master/simulation/modelsim/speechrec_8_1200mv_0c_v_slow.sdo   ;
+; C:/Users/strisorus/Downloads/e155-final-master (1)/e155-final-master/simulation/modelsim/speechrec_min_1200mv_0c_v_fast.sdo ;
+; C:/Users/strisorus/Downloads/e155-final-master (1)/e155-final-master/simulation/modelsim/speechrec_v.sdo                    ;
++-----------------------------------------------------------------------------------------------------------------------------+
 
 
 +-----------------------------+
@@ -88,19 +88,19 @@ applicable agreement for further details.
 Info: *******************************************************************
 Info: Running Quartus II 32-bit EDA Netlist Writer
     Info: Version 12.0 Build 178 05/31/2012 SJ Web Edition
-    Info: Processing started: Thu Nov 20 23:55:41 2014
+    Info: Processing started: Mon Dec 01 22:29:11 2014
 Info: Command: quartus_eda --read_settings_files=off --write_settings_files=off speechrec -c speechrec
-Info (204019): Generated file speechrec_8_1200mv_85c_slow.svo in folder "C:/Users/strisorus/Downloads/e155-finalproject-master/e155-finalproject-master/simulation/modelsim/" for EDA simulation tool
-Info (204019): Generated file speechrec_8_1200mv_0c_slow.svo in folder "C:/Users/strisorus/Downloads/e155-finalproject-master/e155-finalproject-master/simulation/modelsim/" for EDA simulation tool
-Info (204019): Generated file speechrec_min_1200mv_0c_fast.svo in folder "C:/Users/strisorus/Downloads/e155-finalproject-master/e155-finalproject-master/simulation/modelsim/" for EDA simulation tool
-Info (204019): Generated file speechrec.svo in folder "C:/Users/strisorus/Downloads/e155-finalproject-master/e155-finalproject-master/simulation/modelsim/" for EDA simulation tool
-Info (204019): Generated file speechrec_8_1200mv_85c_v_slow.sdo in folder "C:/Users/strisorus/Downloads/e155-finalproject-master/e155-finalproject-master/simulation/modelsim/" for EDA simulation tool
-Info (204019): Generated file speechrec_8_1200mv_0c_v_slow.sdo in folder "C:/Users/strisorus/Downloads/e155-finalproject-master/e155-finalproject-master/simulation/modelsim/" for EDA simulation tool
-Info (204019): Generated file speechrec_min_1200mv_0c_v_fast.sdo in folder "C:/Users/strisorus/Downloads/e155-finalproject-master/e155-finalproject-master/simulation/modelsim/" for EDA simulation tool
-Info (204019): Generated file speechrec_v.sdo in folder "C:/Users/strisorus/Downloads/e155-finalproject-master/e155-finalproject-master/simulation/modelsim/" for EDA simulation tool
+Info (204019): Generated file speechrec_8_1200mv_85c_slow.svo in folder "C:/Users/strisorus/Downloads/e155-final-master (1)/e155-final-master/simulation/modelsim/" for EDA simulation tool
+Info (204019): Generated file speechrec_8_1200mv_0c_slow.svo in folder "C:/Users/strisorus/Downloads/e155-final-master (1)/e155-final-master/simulation/modelsim/" for EDA simulation tool
+Info (204019): Generated file speechrec_min_1200mv_0c_fast.svo in folder "C:/Users/strisorus/Downloads/e155-final-master (1)/e155-final-master/simulation/modelsim/" for EDA simulation tool
+Info (204019): Generated file speechrec.svo in folder "C:/Users/strisorus/Downloads/e155-final-master (1)/e155-final-master/simulation/modelsim/" for EDA simulation tool
+Info (204019): Generated file speechrec_8_1200mv_85c_v_slow.sdo in folder "C:/Users/strisorus/Downloads/e155-final-master (1)/e155-final-master/simulation/modelsim/" for EDA simulation tool
+Info (204019): Generated file speechrec_8_1200mv_0c_v_slow.sdo in folder "C:/Users/strisorus/Downloads/e155-final-master (1)/e155-final-master/simulation/modelsim/" for EDA simulation tool
+Info (204019): Generated file speechrec_min_1200mv_0c_v_fast.sdo in folder "C:/Users/strisorus/Downloads/e155-final-master (1)/e155-final-master/simulation/modelsim/" for EDA simulation tool
+Info (204019): Generated file speechrec_v.sdo in folder "C:/Users/strisorus/Downloads/e155-final-master (1)/e155-final-master/simulation/modelsim/" for EDA simulation tool
 Info: Quartus II 32-bit EDA Netlist Writer was successful. 0 errors, 0 warnings
-    Info: Peak virtual memory: 294 megabytes
-    Info: Processing ended: Thu Nov 20 23:55:42 2014
+    Info: Peak virtual memory: 296 megabytes
+    Info: Processing ended: Mon Dec 01 22:29:12 2014
     Info: Elapsed time: 00:00:01
     Info: Total CPU time (on all processors): 00:00:01
 
