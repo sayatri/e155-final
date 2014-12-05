@@ -37,6 +37,7 @@ typedef enum _STATE
 {
     READY_TO_LISTEN,
     LISTENING,
+	WINDOWING,
     FILTERING,
     TRANSMITTING,
     // processing states
@@ -49,6 +50,7 @@ typedef enum _STATE
 
     // completed processing
     COMPLETED_PROCESSING,
+	DONE
 } STATE;
 
 
@@ -104,12 +106,12 @@ void initspi(void) {
     SPI2CONbits.SMP = 1; // input data sampled at end of data output time
     SPI2CONbits.CKE = 1; // set clock-to-data timing (data centered on rising SCK edge) 
     SPI2CONbits.ON = 1; // turn SPI on
-    SPI2CONbits.MODE32 = 0; // 8-bit datawidth
+    SPI2CONbits.MODE32 = 1; // 8-bit datawidth
     SPI2CONbits.MODE16 = 0; // 8-bit datawidth
 }
 
 
-char spi_send_receive(signed char send) {
+unsigned int spi_send_receive(signed int send) {
     SPI2BUF = send; // send data to slave
     while (!SPI2STATbits.SPIBUSY); // wait until received buffer fills, indicating data received 
     return SPI2BUF; // return received data and clear the read buffer full
@@ -199,183 +201,22 @@ void getstrserial(char *str)
 //******************************************************************************
 //******************************************************************************
 
-// 5ksps for a system clock of 40 MHz, and PBCLKDIV = 2;
 
-// Calculate PB clock time (T_PB) + sample plus convert time
-//     T_PB = (1/40 MHz) * 2 = 50 ns
-//     1/(5ksps) = .2 ms + converttime
-
-// To calculate the ideal TAD. ADC min requirements for TAD.
-//     \frac{.2 ms}{12+1} = 15.385 us = TAD = desired ADC clock period
-
-// Double sample period to 2*TAD
-//     \frac{.2 ms}{12+2} = 14.2857 us = TAD
-//     2*TAD = 28.5814 us = sample time
-
-// Calculate ADC clock divisor value
-//     14.2857 ms/ (1/20Mhz) = 285.714; 
-//     --> 284 --> ADC = 141
-//     --> 286 --> ADC = 142
-
-// Calculate sample rate using ADCS divisors
-//     --> 284 --> \frac{1}{284*(12+2)*50ns} = 5030.181 sps
-//     --> 286 --> \frac{1}{286*(12+2)*50ns} = 4995.005 sps
-
-
-// Verify
-//     TPB = (1/40 MHz) * 2 = 50 ns
-//     TAD = 50 ns * 286 = 14.2 us
-//     TAD * 2 = 28.6 us = sampletime
-
-// Summary:
-//     ACD = 142; ADC clock is PB divided by 286
-//     SAMPC = 2; Sample time is 2 TAD periods 
-
-
-void initADC(void) {
-    /*
-	
-	
-	011 = Signed Fractional 16-bit (DOUT = 0000 0000 0000 0000 sddd dddd dd00 0000)
-	010 = Fractional 16-bit (DOUT = 0000 0000 0000 0000 dddd dddd dd00 0000)
-	001 = Signed Integer 16-bit (DOUT = 0000 0000 0000 0000 ssss sssd dddd dddd)
-	000 = Integer 16-bit (DOUT = 0000 0000 0000 0000 0000 00dd dddd dddd)
-	111 = Signed Fractional 32-bit (DOUT = sddd dddd dd00 0000 0000 0000 0000)
-	110 = Fractional 32-bit (DOUT = dddd dddd dd00 0000 0000 0000 0000 0000)
-	101 = Signed Integer 32-bit (DOUT = ssss ssss ssss ssss ssss sssd dddd dddd)
-	100 = Integer 32-bit (DOUT = 0000 0000 0000 0000 0000 00dd dddd dddd)
-	
-	
-	
-	*/
-    // ADC Control Register 1
-    AD1CON1bits.ON = 0; // ADC is off
-    AD1CON1bits.SIDL = 0; // Continue module operation in Idle mode
-    AD1CON1bits.FORM = 0b100; // ' Signed Integer 32-bit (DOUT = ssss ssss ssss ssss ssss sssd dddd dddd)
-    AD1CON1bits.SSRC = 0b111;       // End sampling and start conversion when SAMP bit cleared
-    AD1CON1bits.CLRASAM = 0;    // Buffer contents overwritten by next conversion sequence
-    AD1CON1bits.ASAM = 0;       //  Sampling begins immediately after last conversion completes; 
-                                // SAMP bit is automatically set
-    AD1CON1bits.SAMP = 0;       // Don't start sampling upon initialization
-
-    // AD1CON2: ADC Control Register 2
-    AD1CON2bits.VCFG = 0;  // In voltage reference
-    AD1CON2bits.OFFCAL = 0;     // disable offset calibration mode
-    AD1CON2bits.CSCNA = 0;      // do not scan inputs for mux
-    AD1CON2bits.BUFM = 1;       // 1 = two 8-word buffers, 0 = one 16-word buffer
-    AD1CON2bits.ALTS = 0;       // Always use MUX A input settings
-	AD1CON2bits.SMPI = 7;        // Eight samples per interrupt
-
-    // AD1CON3: ADC Control Register 3
-    AD1CON3bits.ADRC = 0;       // Use PBCLK
-    AD1CON3bits.SAMC = 3;      		 // Time audio sample bits
-    AD1CON3bits.ADCS = 0b10001110;    //ADC Conversion Clock Select (142)
- 
-// Don't have these registers?
-    // AD1CHS: ADC Input Select Register
-     AD1CHS = 0x00020000; // Connect RB2/AN2 as CH0 input
+void initadc(int channel) {
+	AD1CHS = 0x00020000; // Connect RB2/AN2 as CH0 input
 							// in this example RB2/AN2 is the input
-
-	// TODO: Set TRISx to 1 
-
-
-    // AD1PCFG: ADC Port Configuration Register
-    AD1PCFG = 0xFFFB; // PORTB = Digital; RB2 = analog
-
-    // Interrupt, set when SMPI condition met
-    IFS1CLR = 2;                 // clear the ADC conversion interrupt
-    IEC1SET = 2;                 // Enable ADC conversion interrupt                
+	AD1PCFGCLR = 1 << channel; // configure input pin
+	AD1CON1bits.ON = 1; 	 	// turn ADC on
+	AD1CON1bits.SAMP = 1; 	 	// begin sampling
+	AD1CON1bits.DONE = 0; 	 	// clear DONE flag
 }
-
-void ADC_off(void){
-    AD1CON1bits.ON = 0; // ADC is off
+int readadc(void) {
+	AD1CON1bits.SAMP = 0; 	 	// end sampling, star conversion
+	while (!AD1CON1bits.DONE); // wait until DONE
+	AD1CON1bits.SAMP = 1; 	 	// resume sampling
+	AD1CON1bits.DONE = 0; 	 	// clear DONE flag
+	return ADC1BUF0; 			// return result
 }
-
-void ADC_on(void){
-    AD1CON1bits.ON = 1; // ADC is on
-}
-
-void delay(int milliseconds)
-{
-    long pause;
-    clock_t now,then;
-
-    pause = milliseconds*(CLOCKS_PER_SEC/1000);
-    now = then = clock();
-    while( (now-then) < pause )
-        now = clock();
-}
-
-void ADC_startManuAcq(void) {
- 	delay(100);
-    AD1CON1bits.SAMP = 1;   // the ADC SHA is sampling
-}
-
-void ADC_startAutoAcq(void) {
-    delay(100);
-    AD1CON1bits.ASAM = 1;
-}
-
-// stops sampling and starts conversion
-void ADC_stopManuAcq(void) {
-    AD1CON1bits.SAMP = 0; // 
-}
-
-
-
-
-//Interrupts disabled
-// When the AD1IF flag is set, then....
-// and then clears the flag
-char ADC_getFlag(void) {
-    return (!IFS1 & 0x0002);
-}
-
-void ADC_clearFlag(void) {
-    IFS1CLR = 2; // clear interrupt
-}
-
-// ONLY VALID FOR MANUAL MODE
-char ADC_done(void){
-	return AD1CON1bits.DONE;
-}
-// Only valid when BUFM = 1
-// 1 = ADC is currently filling buffer 0x8-0xF, user should access data in 0x0-0x7
-// 0 = ADC is currently filling buffer 0x0-0x7, user should access data in 0x8-0xF
-char ADC_bufferStatus(void) {
-    return AD1CON2bits.BUFS;
-}
-
-//Check ADC Audo-Sample Time Bits
-char ADC_sampleTime(void){
-    return AD1CON3bits.SAMC;
-}
-
-// Calibrate for offset
-short ADC_calibrateOffset(void){
-    ADC_off();
-    AD1CON2bits.OFFCAL = 1;
-
-    ADC_on();
-
-    ADC_startManuAcq();
-
-    delay(100); // wait .1 seconds;
-
-    ADC_stopManuAcq();
-
-
-    while(!ADC_done());     // check if conversion done
-   
-    int offset = ADC1BUF0;
-
-    ADC_off();              // Don't write to registers when ADC is on
-    AD1CON2bits.OFFCAL = 0; // clear calibration mode
-
-    return (short) offset;
-}
-
-
 
 
 //******************************************************************************
@@ -402,6 +243,26 @@ void startTMR45(void){
 void stopTMR45(void){
     T4CONbits.ON = 0;
 	T5CONbits.ON = 0;
+//	TMR4 = 0x0; // Clear contents of the TMR4 and TMR5
+//	TMR5 = 0x0; // Clear contents of the TMR4 and TMR5
+}
+
+// Use this timer for ADC sampling frequency
+void initTMR2(void){
+	T2CON = 0x0;	// Stop timer and clear control register
+	T2CONbits.TCKPS = 0b111;	//256 prescaler
+	TMR2 = 0x0;		// Clear contents of timer
+	PR2 = 0xFFFF;	// Load period register
+}
+
+void startTMR2(void){
+	TMR2 = 0x0;	// Clear contents
+	T2CONbits.ON = 1;
+}
+
+void stopTMR2(void) {
+	T2CONbits.ON = 0;
+	
 }
 
 
@@ -423,15 +284,20 @@ int main (void)
         signed short ADC_offset;
         unsigned char audioData; // Connected to AN0
 		char str[80];
-        unsigned int rawAudio [3000];
+        unsigned int rawAudio [14000];
+		unsigned int windowedAudio [2000];
         short rawAudioIndex = 0;
+		char i = 0;
+		int max = 0;
+		int currentAudio;
+		int maxIndex;
         
         initspi();
         initUART();
-        initADC();
+        initadc(2);
 		initTMR45();
+		initTMR2();
 
-        ADC_offset = ADC_calibrateOffset();
            
         // set RD[7:0] to output, RD[11:8] to input
         //   RD[7:0] are LEDs
@@ -449,99 +315,105 @@ int main (void)
 		
 
 
-        printf("\nI am configured via UART correctly!\n");
-
-		startTMR45();
+        printf("\n\nI am configured via UART correctly!\n");
 	
        while(1) {
 			PORTE = SARAH_FGPA;
             enable = PORTE & 0x0001;   // pushbutton enable
 		
 // ---- insert successful SPI code ----- //
-			if (Master_State == FILTERING) break;
+			if (Master_State == DONE) {
+				printf("done\n");
+				break;
+			}
+
+			else if (Master_State == FILTERING) {
+				printf("Current state: Filtering\n");
+				printf("The final audio index is %d\n", rawAudioIndex);
+			//	printf("Final time is %i ms\n", ((TMR5 << 16 | TMR4)/78));	
+				printf("The sampling frequency of the ADC is %f Hz",  (rawAudioIndex/((TMR5 << 16 | TMR4)/78.0))*1000.0);
+				break;
+			}
+
+
+			else if (Master_State == PROCESSING_DATA) {
+				printf("Current state: Processing Data\n");
+				printf("done transmitting\n");
+				printf("The sampling frequency of the ADC is %f Hz",  (rawAudioIndex/((TMR5 << 16 | TMR4)/78.0))*1000.0);
+				break;
+			}
+
             switch(Master_State)
             {
                 case READY_TO_LISTEN:
                     // if pushbutton is pressed, then record audio
-                    if (enable == 1) {
+					printf("Current state: Ready to Listen\n");
+                  //  if (enable == 1) {
                         Master_State = LISTENING;
-                        printf("Current state: Ready to Listen\n");
-                    }
+                  //      printf("Current state: Ready to Listen\n");
+                    //}
                     break;
 
                 case LISTENING:
                     printf("Current state: Listening\n");
-
-                    startTMR45();
-                    ADC_on();
-                    ADC_startAutoAcq();
-
-					while ((TMR5 << 16 | TMR4) < 156250) {
-					//	printf("inside TMR45 loop and TMR45 is %i ms\n", ((TMR5 << 16 | TMR4)/78));	
-
-                        while (!IFS1 & 0x0002); // conversion done?
-								
-						if (ADC_bufferStatus()){
-					//		printf("inside if statement\n"); 
-							rawAudio[rawAudioIndex] = ADC1BUF0;
-						//	printf("buffer0 is %u\n", ADC1BUF0);
-						} else {
-					//		printf("inside else statement\n");
-							rawAudio[rawAudioIndex] = ADC1BUF8;
-						//	printf("buffer8 is %u\n", ADC1BUF9);
-						}
-					//	printf("index is %u\n", rawAudioIndex++);
-						
-						printf("%d\n", rawAudio[rawAudioIndex]);
-						
-						// 1 = ADC is currently filling buffer 0x8-0xF, user should access data in 0x0-0x7
-						// 0 = ADC is currently filling buffer 0x0-0x7, user should access data in 0x8-0xF
-						/*if (ADC_bufferStatus()){
-							// store value from 0x0 - 0x7
-						
-							rawAudio[rawAudioIndex] = (signed short) ADC1BUF0;
-							rawAudio[rawAudioIndex + 1] = (signed short) ADC1BUF1;
-							rawAudio[rawAudioIndex + 2] = (signed short) ADC1BUF2;
-							rawAudio[rawAudioIndex + 3] = (signed short)ADC1BUF3;
-							rawAudio[rawAudioIndex + 4] = (signed short) ADC1BUF4;
-							rawAudio[rawAudioIndex + 5] = (signed short) ADC1BUF5;
-							rawAudio[rawAudioIndex + 6] = (signed short) ADC1BUF6;
-							rawAudio[rawAudioIndex + 7] = (signed short)ADC1BUF7;     
-
-						
-
-						} else {
-							// store value from 0x8-0xF
-							rawAudio[rawAudioIndex] = (signed short) ADC1BUF8;
-							rawAudio[rawAudioIndex + 1] = (signed short) ADC1BUF9;
-							rawAudio[rawAudioIndex + 2] = (signed short) ADC1BUFA;
-							rawAudio[rawAudioIndex + 3] = (signed short)ADC1BUFB;
-							rawAudio[rawAudioIndex + 4] = (signed short) ADC1BUFC;
-							rawAudio[rawAudioIndex + 5] = (signed short) ADC1BUFD;
-							rawAudio[rawAudioIndex + 6] = (signed short) ADC1BUFE;
-							rawAudio[rawAudioIndex + 7] = (signed short)ADC1BUFF;   
-
-						}
-
-						printf("Got raw data from ADC: %d\n", rawAudio[rawAudioIndex]);
-						printf("Got raw data from ADC: %d\n", rawAudio[rawAudioIndex+1]);
-						printf("Got raw data from ADC: %d\n", rawAudio[rawAudioIndex+2]);
-						printf("Got raw data from ADC: %d\n", rawAudio[rawAudioIndex+3]);
-						printf("Got raw data from ADC: %d\n", rawAudio[rawAudioIndex+4]);
-						printf("Got raw data from ADC: %d\n", rawAudio[rawAudioIndex+5]);
-						printf("Got raw data from ADC: %d\n", rawAudio[rawAudioIndex+6]);
-						printf("Got raw data from ADC: %d\n", rawAudio[rawAudioIndex+7]);
-						*/
-						ADC_clearFlag();
-						rawAudioIndex += 9;
+					startTMR45();	// sampling duration is 2 seconds
 					
-                    }
+                	while ((TMR5 << 16 | TMR4) < 156250) {
+						startTMR2(); // prepares the ADC sampling at 7khz
+
+						// in case anything goes wrong, break before write outside of array
+						if (rawAudioIndex == 14000){
+							printf("Final time is %i ms\n", ((TMR5 << 16 | TMR4)/78));	
+							Master_State = WINDOWING;
+							break;
+						}
+						
+						
+						while(TMR2 < 11); // wait for 11 TMR2 cycles ~ 7kHz sampling
+
+						rawAudio[rawAudioIndex++] = readadc();
+						printf("raw audio is %d\n", rawAudio[rawAudioIndex - 1]);
+						stopTMR2();				
+               }
            			
-                    ADC_off();
                     stopTMR45();        
-                    Master_State = FILTERING;
+                    Master_State = WINDOWING;
 
                     break;
+				case WINDOWING:
+					printf("Current state: WINDOWING\n");
+					for (i=0; i++; i < rawAudioIndex) {
+						printf("%d\n", rawAudio[i]);
+					}
+
+					max = 0;
+					for (i = 0; i++; i < rawAudioIndex) {
+						currentAudio = rawAudio[i];
+						if (currentAudio > max) {
+							max = currentAudio;
+							maxIndex = i;
+						}							
+					}
+					
+					for (i = 0; i++; i< 2000) {
+					
+						if (maxIndex <= 500) {
+							windowedAudio[i] = rawAudio[i];
+						} else {
+							windowedAudio[i] = rawAudio[i-500];
+						}
+					}
+
+					printf("Done windowing\n");
+
+					for (i=0; i++; i < 2000) {
+						printf("%d\n", windowedAudio[i]);
+					}
+
+					Master_State = TRANSMITTING;
+					
+					
+					break;
                 case FILTERING:
                     printf("You are done sampling");
                     printf("Current state: Filtering\n");
@@ -549,6 +421,14 @@ int main (void)
 
                 case TRANSMITTING:
                     printf("Current state: TRANSMITTING\n");
+					
+					for (i = 0; i ++; i < 2000) {
+						printf("%i\n", i);
+
+						receivedSPI = spi_send_receive(rawAudio[i]);	
+					}
+					
+					Master_State = PROCESSING_DATA;
                     break;
 
                 case PROCESSING_DATA:
@@ -556,6 +436,8 @@ int main (void)
 
                 case COMPLETED_PROCESSING:
                     break;
+				case DONE:
+					break;
 
             }
              
