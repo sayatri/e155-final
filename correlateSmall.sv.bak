@@ -10,21 +10,22 @@
 // assuming everything can be written as arrays
 module correlate(input  logic[2:0] state,
 				input logic		clk,
-				input logic[9:0]	a[1999:0], b[1999:0],
-				output logic[9:0] 	result[3998:0],
+				input logic[9:0]	a[3:0], b[3:0],
+				output logic[9:0] 	result[6:0],
 				output logic 	finished);
 
 	typedef enum logic {PROCESSING=1'b0, DONE=1'b1} statetype;
 	statetype currentState, nextstate;
 
-	byte intA, intB;	// look at one integer at a time 
-	logic[31:0] lengthResult, lengthA;
+	logic[9:0] intA, intB;	// look at one integer at a time 
+	logic[11:0] lengthResult;
+	logic[10:0] lengthA;
 	
-	assign lengthResult = 32'd3999;
-	assign lengthA = 32'd2000;
+	assign lengthResult = 11'd7;
+	assign lengthA = 10'd24;
 	
-	logic [3:0] n;	// FIXME
-	logic [3:0] k;	// FIXME
+	logic [11:0] n;	// iterate through entire output signal
+	logic [10:0] k;	// iterate through one of the signal
 
 
 
@@ -37,32 +38,32 @@ module correlate(input  logic[2:0] state,
 			  currentState <= nextstate;
 
 			  // for n=0:(2*length(a) - 1) -1
-				if (n >= (lengthResult - 1)) n <= lengthResult;
-				else n <= (k == n)? (n + 1): n;
+				if (n >= (lengthResult - 12'b1)) n <= lengthResult;
+				else n <= (k == n)? (n + 12'b1): n;
 				
 				// for k=1:n
 				if (k == n) k = 0;
-				else k = k + 1;
+				else k = k + 11'b1;
 
 				if (state == PROCESSING) begin // where the convolution magic happens
-					intA <= ((n-k) > 3)? 8'b0: {a[(n-k)]};
+					intA <= ((n-k) > 10'd3)? 10'b0: {a[(n-k)]};
 
-					intB <= (lengthA - k < 0)? 8'b0: {b[lengthA - k]};
+					intB <= (lengthA - k < 10'd0)? 10'b0: {b[lengthA - k]};
 
 					result[n] <= result[n] + intA*intB;
 
 				end else begin
-					intA <= 8'b0;
-					intB <= 8'b0;
+					intA <= 10'b0;
+					intB <= 10'b0;
 					result <= result;
 				end
 		
 		end else begin
 			n <= lengthResult;
-			k <= 4'b0;
-			intA <= 8'b0;
-			intB <= 8'b0;
-			result <= '{3999{8'b0}};
+			k <= 11'b0;
+			intA <= 10'b0;
+			intB <= 10'b0;
+			result <= '{7{10'b0}};
 		end
 	end
 

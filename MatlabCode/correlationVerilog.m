@@ -2,7 +2,7 @@
 close all
 % Control to make sure correlation is correct
 a = [1 2 3 4];
-b = [-1 2 1 -1];
+b = [3 4 5 6];
 
 matlabXcorr = xcorr(a, b)
 figure
