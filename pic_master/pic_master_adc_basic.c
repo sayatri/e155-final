@@ -37,9 +37,11 @@ typedef enum _STATE
 {
     READY_TO_LISTEN,
     LISTENING,
-	WINDOWING,
     FILTERING,
-    TRANSMITTING,
+	TRANSMITTING,
+    TRANSMIT_FPGAS,
+	RECEIVE_FPGAS,
+	TRANSMIT_PIC,
     // processing states
     PROCESSING_DATA,
     // SENDING_DATA_TO_FPGAS,
@@ -93,7 +95,10 @@ STATE Master_State = READY_TO_LISTEN;
 // *****************************************************************************
 // *****************************************************************************
 
-void initspi(void) {
+
+
+// for spi2 -------------------------------------
+void initspi2(void) {
     char junk;
 
     IEC0CLR=0x03800000; // disable all interrupts
@@ -111,11 +116,72 @@ void initspi(void) {
 }
 
 
-unsigned int spi_send_receive(signed int send) {
+unsigned int spi_send_receive2(signed int send) {
     SPI2BUF = send; // send data to slave
     while (!SPI2STATbits.SPIBUSY); // wait until received buffer fills, indicating data received 
     return SPI2BUF; // return received data and clear the read buffer full
 }
+
+
+
+// for spi3 ------------------------------
+void initspi3(void) {
+    char junk;
+
+    IEC0CLR=0x03800000; // disable all interrupts
+    SPI3CONbits.ON = 0; // disable SPI to reset any previous state
+    junk = SPI3BUF; // read SPI buffer to clear the receive  SPI2SPIROV = 0; // clear the receive overflow flag
+    SPI3BRG = 7; //set BAUD rate to 1.25MHz, with Pclk at 20MHz 
+    SPI3CONbits.MSTEN = 1; // enable master mode
+    SPI3CONbits.MSSEN = 1;
+    SPI3CONbits.ENHBUF = 0;
+    SPI3CONbits.SMP = 1; // input data sampled at end of data output time
+    SPI3CONbits.CKE = 1; // set clock-to-data timing (data centered on rising SCK edge) 
+    SPI3CONbits.ON = 1; // turn SPI on
+    SPI3CONbits.MODE32 = 1; // 8-bit datawidth
+    SPI3CONbits.MODE16 = 0; // 8-bit datawidth
+}
+
+
+unsigned int spi_send_receive3(signed int send) {
+    SPI3BUF = send; // send data to slave
+    while (!SPI3STATbits.SPIBUSY); // wait until received buffer fills, indicating data received 
+    return SPI3BUF; // return received data and clear the read buffer full
+}
+
+
+
+
+
+
+
+
+// for spi4 --------------------------------
+void initspi4(void) {
+    char junk;
+
+    IEC0CLR=0x03800000; // disable all interrupts
+    SPI4CONbits.ON = 0; // disable SPI to reset any previous state
+    junk = SPI4BUF; // read SPI buffer to clear the receive  SPI2SPIROV = 0; // clear the receive overflow flag
+    SPI4BRG = 7; //set BAUD rate to 1.25MHz, with Pclk at 20MHz 
+    SPI4CONbits.MSTEN = 1; // enable master mode
+    SPI4CONbits.MSSEN = 1;
+    SPI4CONbits.ENHBUF = 0;
+    SPI4CONbits.SMP = 1; // input data sampled at end of data output time
+    SPI4CONbits.CKE = 1; // set clock-to-data timing (data centered on rising SCK edge) 
+    SPI4CONbits.ON = 1; // turn SPI on
+    SPI4CONbits.MODE32 = 1; // 8-bit datawidth
+    SPI4CONbits.MODE16 = 0; // 8-bit datawidth
+}
+
+
+unsigned int spi_send_receive4(signed int send) {
+    SPI4BUF = send; // send data to slave
+    while (!SPI4STATbits.SPIBUSY); // wait until received buffer fills, indicating data received 
+    return SPI4BUF; // return received data and clear the read buffer full
+}
+
+
 
 
 // *****************************************************************************
@@ -277,13 +343,12 @@ void stopTMR2(void) {
 int main (void)
 {
         
-		unsigned char receivedSPI;
-		unsigned char receivedBUFFER;
+		unsigned int receivedSPI;
+		unsigned int receivedBUFFER;
         unsigned char switches;
 		unsigned char switchBuffer;
         unsigned char enable;
-        unsigned int  offset; // points to the base of the idle buffer
-        signed short ADC_offset;
+   
         unsigned char audioData; // Connected to AN0
 		char str[80];
         unsigned int rawAudio [14000];
@@ -291,10 +356,11 @@ int main (void)
         short rawAudioIndex = 0;
 		short i = 0;
 		int max = 0;
+	
 		int currentAudio;
 		int maxIndex;
         
-        initspi();
+        initspi2();
         initUART();
         initadc();
 		initTMR45();
@@ -307,7 +373,7 @@ int main (void)
         TRISD = 0xFF00;
 
         // set RE[0] = 1 to input - for pushbutton enable
-        // set RE[3:1] = 0to output - for slave select
+        // set RE[3:1] = 0 to output - for slave select
 		// set RB[4] = 0 for output for counter
         TRISE = 0x0001; 
 
@@ -377,44 +443,7 @@ int main (void)
                     Master_State = TRANSMITTING;
 
                     break;
-				case WINDOWING:
-					printf("Current state: WINDOWING\n");
-		
-					max = 0;
-					for (i = 0; i < 12000; i++) {
-						currentAudio = rawAudio[i];
-						printf("%i, %i\n", i, rawAudio[i]);
-						if (currentAudio > max) {
-						
-							max = currentAudio;
-							maxIndex = i;
-						}							
-					}
-					
-				
-					printf("maxIndex is %i\n", maxIndex);
-				
-					
-						if (maxIndex <= 500) {
-							for (i = 0; i < 2000; i++){
-								printf("second loop %i\n", i);
-								windowedAudio[i] = rawAudio[i];
-							}
-						} else {
-							for (i = 0; i < 2000; i++){
-								printf("second loop %i\n", i);
-								windowedAudio[i] = rawAudio[i-500];
-							}
-						}
-					
-
-					printf("Done windowing\n");
-
-			
-					Master_State = DONE;
-					
-					
-					break;
+	
                 case FILTERING:
 
                     printf("Current state: Filtering\n");
@@ -424,9 +453,10 @@ int main (void)
                     printf("Current state: TRANSMITTING\n");
 					
 					max = 0;
+					printf("Calculating max index...\n");
 					for (i = 0; i < 12000; i++) {
 						currentAudio = rawAudio[i];
-						printf("%i, %i\n", i, rawAudio[i]);
+					//	printf("%i, %i\n", i, rawAudio[i]);
 						if (currentAudio > max) {
 						
 							max = currentAudio;
@@ -440,23 +470,18 @@ int main (void)
 					
 						if (maxIndex <= 500) {
 							for (i = 0; i < 2000; i++){
-								printf("second loop %i, %i\n", i, rawAudio[maxIndex + i-500]);
+								printf("second loop %i, %i\n", i, rawAudio[i]);
 							//	windowedAudio[i] = rawAudio[i];
-							receivedSPI = spi_send_receive(rawAudio[i]);
+						//	receivedSPI = spi_send_receive2(rawAudio[i]);
 							}
 						} else {
 							for (i = 0; i < 2000; i++){
 								printf("second loop %i, %i\n", i, rawAudio[maxIndex + i-500]);
 						//		windowedAudio[i] = rawAudio[i-500];
-							receivedSPI = spi_send_receive(rawAudio[maxIndex + i-500]);
+						//	receivedSPI = spi_send_receive2(rawAudio[maxIndex + i-500]);
 							}
 						}
 
-				/*	for (i = 0; i < 13000; i++) {
-
-						receivedSPI = spi_send_receive(rawAudio[i]);	
-					} */
-					
 					Master_State = DONE;
                     break;
 
@@ -487,7 +512,7 @@ int main (void)
                 printf("Switches are set to %d.\n", switches);
             }
             
-            receivedBUFFER = spi_send_receive(switchBuffer);
+            receivedBUFFER = spi_send_receive2(switchBuffer);
             //printf("Received this value from slave PIC: %d\n\n", receivedSPI);
             if (receivedBUFFER != receivedSPI){
                 receivedSPI = receivedBUFFER;
