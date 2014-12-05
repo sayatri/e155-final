@@ -289,7 +289,7 @@ int main (void)
         unsigned int rawAudio [14000];
 		unsigned int windowedAudio [2000];
         short rawAudioIndex = 0;
-		char i = 0;
+		short i = 0;
 		int max = 0;
 		int currentAudio;
 		int maxIndex;
@@ -325,15 +325,20 @@ int main (void)
 
 			if (Master_State == DONE) {
 				printf("done\n");
-
-				for (i=0; i < 2000;  i++) {
-						printf("raw audio data is %i\n", rawAudio[i]);
+			/*	printf("print raw audio data \n");
+				for (i=0; i < rawAudioIndex;  i++) {
+						printf("%i, %i\n", i, rawAudio[i]);
 					}
+				
+				printf("print windowed audio data \n");
+				for (i=0; i < 2000;  i++) {
+					printf("%i, %i\n", i, windowedAudio[i]);
+				} */
 
 				printf("The final audio index is %i\n", rawAudioIndex);
 				printf("Final time is %i ms\n", ((TMR5 << 16 | TMR4)/78));	
 				printf("The sampling frequency of the ADC is %f Hz",  (rawAudioIndex/((TMR5 << 16 | TMR4)/78.0))*1000.0);
-				break;
+				while(1);
 			}
 
             switch(Master_State)
@@ -357,7 +362,7 @@ int main (void)
 						// in case anything goes wrong, break before write outside of array
 						if (rawAudioIndex == 14000){
 							printf("Final time is %i ms\n", ((TMR5 << 16 | TMR4)/78));	
-							Master_State = WINDOWING;
+							Master_State = TRANSMITTING;
 							break;
 						}
 						
@@ -365,45 +370,48 @@ int main (void)
 						while(TMR2 < 11); // wait for 11 TMR2 cycles ~ 7kHz sampling
 
 						rawAudio[rawAudioIndex++] = readadc();
-					//	printf("raw audio is %d\n", rawAudio[rawAudioIndex - 1]);
 						stopTMR2();				
             	   }
            			
                     stopTMR45();        
-                    Master_State = DONE;
+                    Master_State = TRANSMITTING;
 
                     break;
 				case WINDOWING:
 					printf("Current state: WINDOWING\n");
-					for (i=0; i++; i < rawAudioIndex) {
-						printf("%d\n", rawAudio[i]);
-					}
-
+		
 					max = 0;
-					for (i = 0; i < rawAudioIndex; i++) {
+					for (i = 0; i < 12000; i++) {
 						currentAudio = rawAudio[i];
+						printf("%i, %i\n", i, rawAudio[i]);
 						if (currentAudio > max) {
+						
 							max = currentAudio;
 							maxIndex = i;
 						}							
 					}
 					
-					for (i = 0; i < 200; i++){
+				
+					printf("maxIndex is %i\n", maxIndex);
+				
 					
 						if (maxIndex <= 500) {
-							windowedAudio[i] = rawAudio[i];
+							for (i = 0; i < 2000; i++){
+								printf("second loop %i\n", i);
+								windowedAudio[i] = rawAudio[i];
+							}
 						} else {
-							windowedAudio[i] = rawAudio[i-500];
+							for (i = 0; i < 2000; i++){
+								printf("second loop %i\n", i);
+								windowedAudio[i] = rawAudio[i-500];
+							}
 						}
-					}
+					
 
 					printf("Done windowing\n");
 
-					for (i=0; i < 2000; i++) {
-						printf("%d\n", windowedAudio[i]);
-					}
-
-					Master_State = TRANSMITTING;
+			
+					Master_State = DONE;
 					
 					
 					break;
@@ -415,13 +423,41 @@ int main (void)
                 case TRANSMITTING:
                     printf("Current state: TRANSMITTING\n");
 					
-					for (i = 0; i < 2000; i++) {
-						printf("%i\n", i);
-
-						receivedSPI = spi_send_receive(rawAudio[i]);	
+					max = 0;
+					for (i = 0; i < 12000; i++) {
+						currentAudio = rawAudio[i];
+						printf("%i, %i\n", i, rawAudio[i]);
+						if (currentAudio > max) {
+						
+							max = currentAudio;
+							maxIndex = i;
+						}							
 					}
 					
-					Master_State = PROCESSING_DATA;
+				
+					printf("maxIndex is %i\n", maxIndex);
+				
+					
+						if (maxIndex <= 500) {
+							for (i = 0; i < 2000; i++){
+								printf("second loop %i, %i\n", i, rawAudio[maxIndex + i-500]);
+							//	windowedAudio[i] = rawAudio[i];
+							receivedSPI = spi_send_receive(rawAudio[i]);
+							}
+						} else {
+							for (i = 0; i < 2000; i++){
+								printf("second loop %i, %i\n", i, rawAudio[maxIndex + i-500]);
+						//		windowedAudio[i] = rawAudio[i-500];
+							receivedSPI = spi_send_receive(rawAudio[maxIndex + i-500]);
+							}
+						}
+
+				/*	for (i = 0; i < 13000; i++) {
+
+						receivedSPI = spi_send_receive(rawAudio[i]);	
+					} */
+					
+					Master_State = DONE;
                     break;
 
                 case PROCESSING_DATA:
