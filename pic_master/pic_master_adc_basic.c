@@ -43,11 +43,11 @@ typedef enum _STATE
 	RECEIVE_FPGAS,
 	TRANSMIT_PIC,
     // processing states
-    PROCESSING_DATA,
+    // PROCESSING_DATA,
     // SENDING_DATA_TO_FPGAS,
-    // RECEIVED_DATA_FROM_ONE_FPGA,
-    // RECEIVED_DATA_FROM_BOTH_FPGA,
-    // SENDING_DATA_PIC,
+     RECEIVED_DATA_FROM_ONE_FPGA,
+     RECEIVED_DATA_FROM_BOTH_FPGA,
+     SENDING_DATA_PIC,
     // RECEIVED_DATA_FROM_PIC,
 
     // completed processing
@@ -360,7 +360,10 @@ int main (void)
 		int currentAudio;
 		int maxIndex;
         
+
         initspi2();
+        initspi3();
+        initspi4();
         initUART();
         initadc();
 		initTMR45();
@@ -469,17 +472,46 @@ int main (void)
 				
 					
 						if (maxIndex <= 500) {
+
+                            // sent over spi2
 							for (i = 0; i < 2000; i++){
-								printf("second loop %i, %i\n", i, rawAudio[i]);
-							//	windowedAudio[i] = rawAudio[i];
-						//	receivedSPI = spi_send_receive2(rawAudio[i]);
+                               // printf("second loop %i, %i\n", i, rawAudio[i]);
+						  	   receivedSPI = spi_send_receive2(rawAudio[i]);
 							}
+
+                     /*       // sent over spi3
+                            for (i = 0; i < 2000; i++){
+                               // printf("second loop %i, %i\n", i, rawAudio[i]);
+                               receivedSPI = spi_send_receive3(rawAudio[i]);
+                            }
+
+                            // sent over spi4
+                            for (i = 0; i < 2000; i++){
+                               // printf("second loop %i, %i\n", i, rawAudio[i]);
+                               receivedSPI = spi_send_receive4(rawAudio[i]);
+                            }  */
+
 						} else {
-							for (i = 0; i < 2000; i++){
-								printf("second loop %i, %i\n", i, rawAudio[maxIndex + i-500]);
-						//		windowedAudio[i] = rawAudio[i-500];
-						//	receivedSPI = spi_send_receive2(rawAudio[maxIndex + i-500]);
-							}
+							
+                            // sent over spi2
+                            for (i = 0; i < 2000; i++){
+                               // printf("second loop %i, %i\n", i, rawAudio[i]);
+                               receivedSPI = spi_send_receive2(rawAudio[i]);
+                            }
+
+                       /*     // sent over spi3
+                            for (i = 0; i < 2000; i++){
+                               // printf("second loop %i, %i\n", i, rawAudio[i]);
+                               receivedSPI = spi_send_receive3(rawAudio[i]);
+                            }
+
+                            // sent over spi4
+                            for (i = 0; i < 2000; i++){
+                               // printf("second loop %i, %i\n", i, rawAudio[i]);
+                               receivedSPI = spi_send_receive4(rawAudio[i]);
+                            } */
+
+
 						}
 
 					Master_State = DONE;
