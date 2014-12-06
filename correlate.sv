@@ -18,6 +18,7 @@ module correlate(input  logic[2:0] topState,
 	typedef enum logic [1:0] {WAITING = 2'b10, PROCESSING=2'b00, DONE=2'b01} statetype;
 	statetype currentState, nextState;
 
+
 	logic [9:0] intA, intB;	// look at one integer at a time 
 	logic [11:0] lengthResult;
 	logic [11:0] lengthA;

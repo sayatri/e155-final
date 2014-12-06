@@ -38,10 +38,11 @@
 
 set_global_assignment -name FAMILY "Cyclone III"
 set_global_assignment -name DEVICE EP3C5E144C8
-set_global_assignment -name TOP_LEVEL_ENTITY compareFromBankSmall
+set_global_assignment -name TOP_LEVEL_ENTITY speechrec
 set_global_assignment -name ORIGINAL_QUARTUS_VERSION 13.1
 set_global_assignment -name PROJECT_CREATION_TIME_DATE "21:52:49  NOVEMBER 18, 2014"
-set_global_assignment -name LAST_QUARTUS_VERSION 12.0
+set_global_assignment -name LAST_QUARTUS_VERSION 11.0
+set_global_assignment -name SYSTEMVERILOG_FILE speechrec.sv
 set_global_assignment -name PROJECT_OUTPUT_DIRECTORY output_files
 set_global_assignment -name MIN_CORE_JUNCTION_TEMP 0
 set_global_assignment -name MAX_CORE_JUNCTION_TEMP 85
@@ -65,13 +66,12 @@ set_location_assignment PIN_99 -to sck
 set_location_assignment PIN_76 -to sdi
 set_location_assignment PIN_75 -to sdo
 set_location_assignment PIN_74 -to ss
-set_location_assignment PIN_68 -to rec_clk[3]
-set_location_assignment PIN_67 -to rec_clk[2]
-set_location_assignment PIN_66 -to rec_clk[1]
-set_location_assignment PIN_65 -to rec_clk[0]
-set_global_assignment -name SYSTEMVERILOG_FILE correlateSmall.sv
-set_global_assignment -name SYSTEMVERILOG_FILE compareFromBankSmall.sv
+set_global_assignment -name SYSTEMVERILOG_FILE correlate.sv
+set_global_assignment -name SYSTEMVERILOG_FILE compareFromBank.sv
 set_global_assignment -name PARTITION_NETLIST_TYPE SOURCE -section_id Top
 set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_ROUTING -section_id Top
 set_global_assignment -name PARTITION_COLOR 16764057 -section_id Top
+set_global_assignment -name SYSTEMVERILOG_FILE store.sv
+set_global_assignment -name TEXT_FILE audiobank.txt
+set_global_assignment -name TEXT_FILE fake.txt
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top

@@ -23,7 +23,7 @@ module compareFromBank(
 	logic finishedOne, finishedTwo;
 	
 	initial
-			$readmemh("audioBankRom.txt", audiobank); 
+		$readmemh("audioBankRom.txt", audiobank); 
 			
 	assign One = audiobank[1999:0];	// Cat
 	assign Two = audiobank[3999:2000];	// open

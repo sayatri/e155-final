@@ -4,48 +4,54 @@
 // 
 // Receives an audio signal via SPI and compares it to audio signals stored in memory
 
-module speechrec(input  logic       clk, sck, sdo, ss, reset,
-                 output logic       sdi,
+module speechrec(input  logic       clk, sck, sdi, ss, reset,
+                 output logic       sdo,
                  output logic [7:0] led,
 					  output logic [3:0] result); //TODO
 
     // Extra signals
-    //logic input_ready;     // Keep track of whether or not input audio has been
-                           // received and processing is ready to begin
-    //logic transmit_ready;  // Keep track of whether or not processing is complete
-                           // and data is ready to be sent back to master
-    logic [7:0]     data_send, data_receive, junk_send, junk_receive;
-    //byte            audio[1999:0]; // TODO: Received data for testing
-    //logic [3:0]     count; // TODO: Shortened counter for testing
+	 logic data_ready;      // Keep track of whether or not 32-bit data is ready to be stored
+    logic input_ready;     // Keep track of whether or not input audio has been received and
+                           //   processing is ready to begin
+    logic transmit_ready;  // Keep track of whether or not processing is complete and data
+                           //   is ready to be sent back to master
+	 logic transmit_done;   // Keep track of whether or not transmission of data to the master
+	                        //   has been completed
+
+    logic [31:0] data_send, data_receive, junk_send, junk_receive; // Data logic
+    logic [9:0]  audio[1999:0];                                    // Received audio data
     //logic         enable_processing;
     //logic           complete_send;
-    //logic            transmit_done;
     
 
     // State signals
-    //typedef enum logic [2:0] {S0=3'b000, S1=3'b001, S2=3'b010, S3=3'b011, S4=3'b100} statetype;
-    //statetype state, nextstate;
+    typedef enum logic [2:0] {S0=3'b111, S1=3'b001, S2=3'b010, S3=3'b011, S4=3'b100} statetype;
+    statetype state, nextstate;
 
     // State register
-   // always_ff @(posedge clk)
-       // state <= nextstate;
+    always_ff @(posedge clk)
+        state <= nextstate;
 
     // Next state logic
-    //always_comb begin
-      //  case(state)
-       //     S0: nextstate =             ss ? S1 : S0; // S0: Wait for master to send input audio
-       //     S1: nextstate =    input_ready ? S3 : S1; // S1: Receive the audio
-      //      S2: nextstate = transmit_ready ? S3 : S2; // S2: Process the audio
-       //     S3: nextstate =             ss ? S4 : S3; // S3: Wait for master to be ready
-       //     S4: nextstate =  transmit_done ? S0 : S4; // S4: Transmit the audio
-       //     default: nextstate = S0;
-     //  endcase
-   // end
+    always_comb begin
+        case(state)
+            S0: nextstate =             ss ? S1 : S0; // S0: Wait for master to send input audio
+            S1: nextstate =    input_ready ? S0 : S1; // S1: Receive the audio
+            S2: nextstate = transmit_ready ? S3 : S2; // S2: Process the audio
+            S3: nextstate =             ss ? S4 : S3; // S3: Wait for master to be ready
+            S4: nextstate =  transmit_done ? S0 : S4; // S4: Transmit the audio
+            default: nextstate = S0;
+       endcase
+    end
     
+	 assign led[2:0] = S0;
+	 assign led[5:3] = nextstate;
+	 
    // spi_send_receive receiver(state, sck, sdo, sdi, reset, junk_send, data_receive, input_ready);
 	// spi_send_receive receiver(state, sck, sdi, sdo, reset, data_send, data_receive);
-	spi_send_receive receiver(sck, sdi, sdo, data_send, data_receive, led);
+	spi_send_receive receiver(state, sck, sdi, sdo, data_send, data_receive, data_ready);
 	assign data_send = data_receive;
+	compile_audio compiler(clk, state, data_receive, data_ready, audio, input_ready);
     //assign led = data_receive;
      // FIXME vvv
      //store store_int(state, sck, data_receive, input_ready, audio);
@@ -56,75 +62,68 @@ module speechrec(input  logic       clk, sck, sdo, ss, reset,
 
 endmodule
 
-module spi_send_receive(input logic sck, //from master
-                   output logic sdo,
-                   input  logic sdi, //from master 
-						 input  logic[7:0] d,
-                   output logic[7:0] q,
-                   output logic[7:0] led); // data received
-						 
-  logic [2:0] cnt;
-  logic [7:0] buffer;
-  logic qdelayed;
-  
-  always_ff @(negedge sck) begin
-    cnt <= cnt + 3'b1;
-	 
-	 if (cnt >= 3'd7) begin
-	     q <= buffer;
+module compile_audio(input  logic        clk,
+                     input  logic [2:0]  state,
+                     input  logic [31:0] data,
+                     input  logic        data_ready,
+                     output logic [9:0]  audio[1999:0],
+						   output logic        input_ready);
+
+  logic [10:0] cnt;
+							
+  always_ff @(posedge clk) begin
+    // Reset the counter if new data is going to be received
+    if (state == 3'b000) begin
+	   cnt <= 0;
 	 end
+
+	 // Add to the audio array until all data has been added
+    else if (data_ready && cnt < 11'd2000) begin
+	   audio[cnt] <= data[9:0];
+		cnt <= cnt + 11'b1;
+	 end
+	 else begin
+	   cnt <= 11'd2001;   // Make sure the counter doesn't overflow
+	 end
+	 
+	 // Set the flag when all the data has been added
+	 input_ready <= (cnt >= 11'd2000 && state == 3'b001);
+  end
+endmodule	
+                     
+
+module spi_send_receive(input  logic [2:0]  state,
+                        input  logic        sck, sdi,  // from master
+                        output  logic       sdo,   // from master 
+	     				     	input  logic [31:0] d,
+                        output logic [31:0] q,     // data received
+								output logic        flag); // state flag
+						 
+  logic [4:0]  cnt;
+  logic [31:0] buffer;
+  logic        qdelayed;
+  
+  always_ff @(negedge sck) begin	 
+    // set flag and store data after data fully exchanged
+	 if (cnt >= 5'd31) begin
+	   q   <= buffer;
+	 end
+	 
+	 // increase count if in a state where the module is active
+	 if (state == 3'b001 || state == 3'b100) begin
+	   cnt <= cnt + 5'b1;
+	 end
+  end
+  
+  always_comb begin
+	 flag = ((cnt >= 5'd31) & (state == 3'b001 || state == 3'b100));
   end
 	
   always_ff @(posedge sck)
-    buffer <= (cnt == 0) ? d : {buffer[6:0], sdi}; //shift register
+    buffer <= (cnt == 0) ? d : {buffer[30:0], sdi}; //shift register
 
   always_ff @(negedge sck)
-    qdelayed <= buffer[7];
+    qdelayed <= buffer[31];
 
-  assign sdo = (cnt == 0) ? d[7] : qdelayed;
-  assign led = q;
-endmodule
-
-
-// OLD MODULE FOR REFERENCE
-module spi_send_receive_old(input logic[2:0] state,
-                        input logic sck, // from master 
-                        input logic sdo, // from master
-                        output logic sdi, // to master
-                        input logic reset,
-                        input logic [7:0] d, // data to send 
-                        output logic [7:0] q); // data received
-                        //output logic flag); // dependent on state
-
-    logic [2:0] cnt = 0; 
-    logic qdelayed;
-
-    // 3-bit counter tracks when full byte is transmitted and new d should be sent
-    always_ff @(negedge sck, posedge reset)
-
-        if (reset) begin
-            cnt <= 0;
-           // flag <= 0;
-        end
-       // else if (cnt == 3'b111)  begin
-            //cnt <= cnt + 3'b1;
-
-            // Set flag after all data is exchanged
-           // flag <= (1 & (state == 3'b001 || state == 3'b100)); 
-        //end
-        else
-            cnt <= cnt + 3'b1;
-
-
-    // loadable shift register
-    // loads d at the start, shifts sdo into bottom position on subsequent step 
-    always_ff @(posedge sck)
-        q <= (cnt == 0) ? d : {q[6:0], sdo};
-
-    // align sdi to falling edge of sck // load d at the start
-    always_ff @(negedge sck)
-        qdelayed = q[7];
-
-    assign sdi = (cnt == 0) ? d[7] : qdelayed;
-
+  assign sdo = (cnt == 0) ? d[31] : qdelayed;
 endmodule
