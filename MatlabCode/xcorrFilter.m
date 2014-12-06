@@ -55,7 +55,7 @@ end
 % suptitle('Result of Matlab xcorr Function');
 
 figure
-plotAll(fftxCorr, allSignalNames)
+%plotAll(fftxCorr, allSignalNames)
 suptitle('Result of fft xcorr Function');
 
 % figure

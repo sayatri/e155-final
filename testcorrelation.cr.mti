@@ -1,0 +1,17 @@
+C:/Users/Amy/Documents/GitHub/e155-final/correlate.sv {2 {vlog -work work -sv C:/Users/Amy/Documents/GitHub/e155-final/correlate.sv
+Model Technology ModelSim ALTERA vlog 10.1d Compiler 2012.11 Nov  2 2012
+-- Compiling module correlate
+** Warning: C:/Users/Amy/Documents/GitHub/e155-final/correlate.sv(87): (vlog-2182) 'maxResult' might be read before written in always_comb block.
+
+
+Top level modules:
+	correlate
+
+} {} {}} C:/Users/Amy/Documents/GitHub/e155-final/compareFromBank.sv {1 {vlog -work work -sv C:/Users/Amy/Documents/GitHub/e155-final/compareFromBank.sv
+Model Technology ModelSim ALTERA vlog 10.1d Compiler 2012.11 Nov  2 2012
+-- Compiling module compareFromBank
+
+Top level modules:
+	compareFromBank
+
+} {} {}}

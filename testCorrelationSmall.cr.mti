@@ -1,0 +1,8 @@
+C:/Users/Amy/Documents/GitHub/e155-final/compareFromBankSmall.sv {1 {vlog -work work -sv C:/Users/Amy/Documents/GitHub/e155-final/compareFromBankSmall.sv
+Model Technology ModelSim ALTERA vlog 10.1d Compiler 2012.11 Nov  2 2012
+-- Compiling module compareFromBankSmall
+
+Top level modules:
+	compareFromBankSmall
+
+} {} {}}

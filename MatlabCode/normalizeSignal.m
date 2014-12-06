@@ -7,7 +7,7 @@ function [ normSignals ] = normalizeSignal( allSignals )
 %       for loop.
 %               
 % input signal - audio input in time domain, can take single column or
-%                matrix
+%                matrix.
 % output normSignal - normalized signal in the time domain
 
 % get max amplitude from signal

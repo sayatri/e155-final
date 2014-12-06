@@ -16,17 +16,24 @@ newSignal = getaudiodata(recSignal);
 % Assign whether or not you want to test a new signal, or signal in the
 % audio bank.
 
-testSignal = newSignal;
+testSignal = modCatAudio';
+
+allModAudio = [modCatAudio     modStopAudio];
+allModNames = {'modCatAudio' 'modStopAudio'};
+
+%%
 
 
 % concatenate the signals
-normSignal = normalizeSignal(allSignals);
-normTestSignal = normalizeSignal(testSignal);
+normSignal = allModAudio; %normalizeSignal(allSignals);
+normTestSignal = testSignal';
 
-disp('Begin processing data with the DTW Filter...');
+% disp('Begin processing data with the DTW Filter...');
+% dtwFilter(normTestSignal, normSignal, allModNames);
 
-xcorrFilter(normTestSignal, normSignal, allSignalNames);
 disp(' ');
 disp('Begin processing data with the xcorr Filter...');
 
-xcorrFilter(normTestSignal, normSignal, allSignalNames);
+xcorrFilter(normTestSignal, allModAudio, allModNames);
+
+

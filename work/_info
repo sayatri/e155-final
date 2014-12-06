@@ -1,0 +1,73 @@
+m255
+K3
+13
+cModel Technology
+Z0 dC:\Users\Amy\Documents\GitHub\e155-final
+vcompareFromBank
+Z1 DXx6 sv_std 3 std 0 22 F[19LRNL:5;XmIFh[XOPn1
+Z2 ICPHcn^`278E2l_jnm^7>[3
+Z3 VzEVSSlZ2Xl;CKENeh>z;^0
+Z4 !s105 compareFromBank_sv_unit
+S1
+Z5 dC:\Users\Amy\Documents\GitHub\e155-final
+Z6 w1417850714
+Z7 8C:/Users/Amy/Documents/GitHub/e155-final/compareFromBank.sv
+Z8 FC:/Users/Amy/Documents/GitHub/e155-final/compareFromBank.sv
+L0 5
+Z9 OV;L;10.1d;51
+r1
+31
+Z10 !s90 -reportprogress|300|-work|work|-sv|C:/Users/Amy/Documents/GitHub/e155-final/compareFromBank.sv|
+Z11 o-work work -sv -O0
+Z12 ncompare@from@bank
+!i10b 1
+Z13 !s100 lb05RZn5JBo<UJccOgke70
+!s85 0
+Z14 !s108 1417850727.033000
+Z15 !s107 C:/Users/Amy/Documents/GitHub/e155-final/compareFromBank.sv|
+!s101 -O0
+vcompareFromBankSmall
+R1
+Z16 IGO98]IRR9U;4KN28kC?kQ0
+Z17 V<9cF306:B1n]KQ2FBn5b?0
+Z18 !s105 compareFromBankSmall_sv_unit
+S1
+R5
+Z19 w1417847732
+Z20 8C:/Users/Amy/Documents/GitHub/e155-final/compareFromBankSmall.sv
+Z21 FC:/Users/Amy/Documents/GitHub/e155-final/compareFromBankSmall.sv
+L0 5
+R9
+r1
+31
+Z22 !s90 -reportprogress|300|-work|work|-sv|C:/Users/Amy/Documents/GitHub/e155-final/compareFromBankSmall.sv|
+R11
+Z23 ncompare@from@bank@small
+Z24 !s100 nNECI4C6D6GLzhf_H6S2K2
+Z25 !s108 1417848310.088000
+Z26 !s107 C:/Users/Amy/Documents/GitHub/e155-final/compareFromBankSmall.sv|
+!i10b 1
+!s85 0
+!s101 -O0
+vcorrelate
+R1
+!i10b 1
+Z27 !s100 Whi^zYU7CBo;o7UT6f<i^1
+Z28 I=ZgNmz45e=1b=Ok?L00mR3
+Z29 V;ZRW]bg]7SHi<nfZjYOeD1
+Z30 !s105 correlate_sv_unit
+S1
+R5
+w1417850720
+Z31 8C:/Users/Amy/Documents/GitHub/e155-final/correlate.sv
+Z32 FC:/Users/Amy/Documents/GitHub/e155-final/correlate.sv
+L0 11
+R9
+r1
+!s85 0
+31
+!s108 1417850727.184000
+!s107 C:/Users/Amy/Documents/GitHub/e155-final/correlate.sv|
+Z33 !s90 -reportprogress|300|-work|work|-sv|C:/Users/Amy/Documents/GitHub/e155-final/correlate.sv|
+!s101 -O0
+R11

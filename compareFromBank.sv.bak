@@ -2,33 +2,53 @@
 // Has been tested at all
 // psuedo code for comparing a sample from a bank
 
-module compareFromBank(input logic	clk,
-						input logic [7:0] audio[1999:0],
-						output logic [3:0] result)
+module compareFromBank(
+                  input  logic[2:0] state,
+                  input  logic	clk,
+					//	input  byte audio[1999:0],
+					output logic resultCompare,
+					output logic finalIndex,
+					output logic transmit_ready);
 	
+											
 	// Load audiobank from ROM
-	logic[7:0] audiobank[7999:0]; // Assumes we have 4 audio samples
+	logic [9:0] audiobank[3999:0]; // Assumes we have 4 audio samples
 								 // 2000 8-bit samples each
-	initial $readmemb("audiobank", audiobank); 			
-
 
 	// Identify each audio sample
-	logic[7:0] open[1999:0];
-	logic[7:0] close[1999:0];
-	logic[7:0] on[1999:0];
-	logic[7:0] off[1999:0];
+	logic[9:0] cat[1999:0], stop[1999:0], audio[1999:0];
+	
+	// The result of the correlation
+	logic[9:0] maxResultCat, maxresultStop;
+	logic[11:0] maxIndexCat, maxIndexStop;
+					
+	logic finishedCat, finishedStop;
+	
+	initial
+			$readmemb("audioBankRom.txt", audiobank); 
+			
+	assign cat = audiobank[1999:0];
+	assign stop = audiobank[3999:2000];
+	assign audio = cat;
 
-	assign open = {audiobank[0]};
-	assign close = {audiobank[2000]};
-	assign on = {audiobank[4000]};
-	assign off = {audiobank[6000]};
+	//assign on = '{audiobank[5999:4000]};
+	//assign off = '{audiobank[7999:6000]};
+			
 
-	correlate correlateOpen(clk, audio, open, resultOpen);
-	correlate correlateClose(clk, audio, close, resultClose);
-	correlate corelateOn(clk, audio, On, resultOn);
-	correlate correlateOff(clk, audio, Off, resultOff);
+	correlate corelateCat(state, clk, audio, cat, finishedCat, maxResultCat, maxIndexCat);
+	correlate correlateOpen(state, clk, audio, stop, finishedStop, maxresultStop, maxIndexStop);
+	
+	always_comb begin
+		if (maxresultStop > maxResultCat) begin
+			resultCompare = 1'b1;
+			finalIndex = maxIndexStop;
+		end else begin
+			resultCompare = 1'b0;
+			finalIndex	= maxIndexCat;
+		end
+	end
 
-	// TODO find max of the four
-	// return whichever is max
+	assign transmit_ready = (finishedCat & finishedStop );
+
 
 endmodule
