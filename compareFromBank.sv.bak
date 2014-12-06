@@ -3,11 +3,10 @@
 // psuedo code for comparing a sample from a bank
 
 module compareFromBank(
-                  input  logic[2:0] state,
-                  input  logic	clk,
-					//	input  byte audio[1999:0],
-					output logic resultCompare,
-					output logic finalIndex,
+                  	input  logic[2:0] state,
+                  	input  logic	clk,
+					output logic[14:0] resultOne, resultTwo,
+					output logic[11:0] maxIndexOne, maxIndexTwo,
 					output logic transmit_ready);
 	
 											
@@ -16,39 +15,31 @@ module compareFromBank(
 								 // 2000 8-bit samples each
 
 	// Identify each audio sample
-	logic[9:0] cat[1999:0], stop[1999:0], audio[1999:0];
+	logic[9:0] One[1999:0], Two[1999:0], audio[1999:0];
 	
 	// The result of the correlation
-	logic[9:0] maxResultCat, maxresultStop;
-	logic[11:0] maxIndexCat, maxIndexStop;
+	logic[35:0] maxResultOne, maxresultTwo; // cat
 					
-	logic finishedCat, finishedStop;
+	logic finishedOne, finishedTwo;
 	
 	initial
-			$readmemb("audioBankRom.txt", audiobank); 
+			$readmemh("audioBankRom.txt", audiobank); 
 			
-	assign cat = audiobank[1999:0];
-	assign stop = audiobank[3999:2000];
-	assign audio = cat;
+	assign One = audiobank[1999:0];	// Cat
+	assign Two = audiobank[3999:2000];	// open
+	assign audio = One;
 
 	//assign on = '{audiobank[5999:4000]};
 	//assign off = '{audiobank[7999:6000]};
 			
 
-	correlate corelateCat(state, clk, audio, cat, finishedCat, maxResultCat, maxIndexCat);
-	correlate correlateOpen(state, clk, audio, stop, finishedStop, maxresultStop, maxIndexStop);
+	correlate corelateOne(state, clk, audio, One, finishedOne, maxResultOne, maxIndexOne);
+	correlate correlateOpen(state, clk, audio, Two, finishedTwo, maxresultTwo, maxIndexTwo);
 	
-	always_comb begin
-		if (maxresultStop > maxResultCat) begin
-			resultCompare = 1'b1;
-			finalIndex = maxIndexStop;
-		end else begin
-			resultCompare = 1'b0;
-			finalIndex	= maxIndexCat;
-		end
-	end
+	assign transmit_ready = (finishedOne & finishedTwo );
 
-	assign transmit_ready = (finishedCat & finishedStop );
+	assign resultOne = maxResultOne[35:21];
+	assign resultTwo = maxResultTwo[35:21];
 
 
 endmodule
