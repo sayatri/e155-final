@@ -10,18 +10,18 @@
 // assuming everything can be written as arrays
 module correlate(input  logic[2:0] state,
 				input logic		clk,
-				input logic[9:0]	a[1999:0], b[1999:0],
-				output logic[9:0] 	result[3998:0],
+				input byte		a[1999:0], b[1999:0],
+				output byte 	result[3998:0],
 				output logic 	finished);
 
 	typedef enum logic {PROCESSING=1'b0, DONE=1'b1} statetype;
-	statetype currentState, nextstate;
+   statetype currentState, nextstate;
 
 	byte intA, intB;	// look at one integer at a time 
 	logic[31:0] lengthResult, lengthA;
 	
 	assign lengthResult = 32'd3999;
-	assign lengthA = 32'd2000;
+	assign lengthA = 32'd1999;
 	
 	logic [3:0] n;	// FIXME
 	logic [3:0] k;	// FIXME

@@ -23,7 +23,7 @@ module compareFromBank(
 					
 	logic openFin, closeFin, onFin, offFin;
 	initial
-			$readmemb("audiobBankRom.txt", audiobank); 
+			$readmemb("audiobank.txt", audiobank); 
 			
 	//assign open = '{audiobank[1999:0]};
 	//assign close = '{audiobank[3999:2000]};
