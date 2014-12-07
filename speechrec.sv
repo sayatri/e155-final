@@ -58,7 +58,7 @@ module speechrec(input  logic       clk, sck, sdi, ss, reset,
 	// spi_send_receive receiver(state, sck, sdi, sdo, reset, data_send, data_receive);
 	spi_send_receive comm(state, sck, sdi, sdo, data_send, data_receive, data_exchanged);
 	compile_audio compiler(clk, state, data_receive, data_exchanged, audio, input_ready, cnt);
-	compare_signals checker(state, data_send, data_receive, data_confirmed);
+	compare_signals checker(state, data_send, compare_receive, data_confirmed);
 	
 	// TODO: Temporarily always be ready to transmit on the state
 	assign transmit_ready = (state == S3);//input_ready;
@@ -70,6 +70,7 @@ module speechrec(input  logic       clk, sck, sdi, ss, reset,
 	logic [9:0] res;
 	assign res = 10'b1010101010;
 	assign data_send = 32'h00001111;
+  assign compare_receive = ((state == S6) && data_exchanged)? data_received : 32'b0;
 
 	
     //assign led = data_receive;
@@ -87,7 +88,7 @@ module compare_signals(input  logic [3:0]  state,
                        input  logic [31:0] received,
 							  output logic        data_confirmed);
   always_comb begin
-    if (state == 4'b110)  data_confirmed = (sent == received);
+    if (state == 4'b000)  data_confirmed = (sent == received);
 	 else                  data_confirmed = 0;
   end
 							  
