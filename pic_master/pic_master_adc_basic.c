@@ -396,27 +396,6 @@ int main (void)
 		
        while(1) {
 	
-
-		/*	if (Master_State == DONE) {
-
-				printf("done\n");
-
-			/*	printf("print raw audio data \n");
-				for (i=0; i < rawAudioIndex;  i++) {
-						printf("%i, %i\n", i, rawAudio[i]);
-					}
-				
-				printf("print windowed audio data \n");
-				for (i=0; i < 2000;  i++) {
-					printf("%i, %i\n", i, windowedAudio[i]);
-				} 
-
-				printf("The final audio index is %i\n", rawAudioIndex);
-				printf("Final time is %i ms\n", ((TMR5 << 16 | TMR4)/78));	
-				printf("The sampling frequency of the ADC is %f Hz",  (rawAudioIndex/((TMR5 << 16 | TMR4)/78.0))*1000.0);
-				while(1);
-			} */
-
             switch(Master_State)
             {
                 case READY_TO_LISTEN:
@@ -427,21 +406,20 @@ int main (void)
 					READY_TO_LISTEN_TO_FPGA1 = 0;
 					FPGA1_SS = 0; 
 
-                    if (LISTEN_ENABLE == 1) {
-                        Master_State = LISTENING;
-                    }
+                    if (LISTEN_ENABLE == 1) Master_State = LISTENING;
                     break;
 
                 case LISTENING:
-				
-                    printf("Current state: Listening\n");
-					startTMR45();	// sampling duration is 2 seconds
+				    printf("Current state: Listening\n");
 					
-                	while ((TMR5 << 16 | TMR4) < 156250) {			
+					startTMR45();	// sampling duration is 2 seconds
+					 while ((TMR5 << 16 | TMR4) < 156250) {	
+		
 						startTMR2(); // prepares the ADC sampling at 7khz
 						while(TMR2 < 11); // wait for 11 TMR2 cycles ~ 7kHz sampling
 						rawAudio[rawAudioIndex++] = readadc();
 						stopTMR2();				
+
             	   }
            	
                     stopTMR45();        
@@ -454,16 +432,14 @@ int main (void)
 
                 case CALCULATE_MAX:
                     printf("Current state: CALCULATE_MAX\n");
-					
-					
+									
 					max = 0;
 					printf("Calculating max index...\n");
 					for (i = 0; i < 12000; i++) {
 						currentAudio = rawAudio[i];
-					
 						if (currentAudio > max) {				
 							max = currentAudio;
-							maxIndex = i;
+							maxIndex = i; 
 						}							
 					}
 
@@ -480,7 +456,6 @@ int main (void)
 					
 					printf("FPGA to be ready to receive\n");	
 					if (maxIndex <= 500) {
-						// sent over spi2
 						for (i = 0; i < 2000; i++){
 							printf("second loop %i, %i\n", i, rawAudio[i]);
 							receivedSPI = spi_send_receive2(rawAudio[i]);				
@@ -504,23 +479,17 @@ int main (void)
                 case RECEIVE_DATA_FROM_FPGA1:
 					printf("State: RECEIVE_DATA_FROM_FPGA1\n");		
 					
+					//************ PIC STATE 3
 					// check for fpga ready to transmit
-					while(!FPGA1_TRANSMIT_READY){
-						printf("pic state 3\n"); 
-					}
-					
-					// ******* PIC SHOULD BE IN STATE 3
+					while(!FPGA1_TRANSMIT_READY) printf("pic state 3\n"); 
+			
 					printf("FPGAG1 input ready \n");
-
-					
 
 					FPGA1_SS = 1; // turn on slave select, PIC goes to state 4
 
 					
 					// ******* PIC SHOULD BE IN STATE 4
-					while(!FPGA1_RECEIVE_READY){
-						printf("pic state 4\n");
-					}
+					while(!FPGA1_RECEIVE_READY)	printf("pic state 4\n");
 				
 					fpga1_results = spi_send_receive2(sendjunk);
 
@@ -528,10 +497,10 @@ int main (void)
 					
 					printf("Received results from FPGA1 [%u], pic should be in state 5", fpga1_results);
 
+					//************ BREAKPOINT
 					Master_State = DONE;
 					break;
-
-				//	FPGA1_SS = 0; //turn off slave select
+					//************ BREAKPOINT
 
 					Master_State = CONFIRM_DATA_FROM_FPGA1;
 
@@ -540,9 +509,7 @@ int main (void)
 				case CONFIRM_DATA_FROM_FPGA1:
 					
 					FPGA1_SS = 1; //turn off slave select, PIC state 5 -> state 6
-					while(!FPGA1_RECEIVE_READY){ 
-						printf("pic state 6\n");
-					}
+					while(!FPGA1_RECEIVE_READY)	printf("pic state 6\n");
 					
 					receivedSPI = spi_send_receive2(fpga1_results);
 
