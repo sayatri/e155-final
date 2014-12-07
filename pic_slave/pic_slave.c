@@ -1,7 +1,19 @@
+
+
 #include <plib.h>
 #include <stdio.h>
 #include <p32xxxx.h>
 #include <math.h>
+#include "HelloByeYesNo.h"
+
+
+/*********
+ DEFINES
+*********/
+#define	HELLO_OFFSET		(0)
+#define	BYE_OFFSET			(2000)
+#define YES_OFFSET			(4000)
+#define	NO_OFFSET			(6000)	
 
 /*********
  GLOBALS
@@ -9,16 +21,16 @@
 
 unsigned short NUM_DATA = 2000;
 
-unsigned int[] audio_bank[4];
-
 unsigned short i = 0;
 unsigned int input_audio[2000];
 unsigned int fpga_results[4];
+
 unsigned int audio_delays[4];
-unsigned float dtw_results[2];
+float dtw_results[2];
 
 unsigned short best_index[2] = {0,0};
 unsigned short best_value[2] = {0,0};
+
 
 
 /***********
@@ -164,16 +176,24 @@ float dtw(int *signal1, int *signal2, int signal1_start, int signal2_start, int 
 int main(void)
 {
     // GET THE AUDIO FILE ---------
+
+		
     // Initialize SPI/UART
     initUART();
     initSPI();
 
-    printf("Slave PIC running with UART\n");
+	int offset[4] = {HELLO_OFFSET, BYE_OFFSET, YES_OFFSET, NO_OFFSET};
+
+	char names[4][5] = {"hello", "bye", "yes", "no"};
+
+	printf("Slave PIC running with UART\n");
     printf("Waiting for input audio data...\n");
 
     // Receive the entirety of the input audio file
     unsigned int temp;
     unsigned int junk = 0;
+	int j;
+	int k;
  
     while (i < NUM_DATA) {
         temp = spi_send_receive(junk);
@@ -187,7 +207,7 @@ int main(void)
     //    printf("%i, %i\n", j, audio[j]);
     //}
 
-    printf("Waiting for results of FPGA...\n");
+    /*printf("Waiting for results of FPGA...\n");
 
     // Receive the results of cross-correlation via SPI
     unsigned int fpga_data[4];
@@ -224,12 +244,37 @@ int main(void)
             best_index[1] = bank_id;
             best_value[1] = fpga_results[bank_id];
         }
-    }
+    } */
 
     printf("Performing DTW...\n");
 
+	j = 0;
+	k = 0;
+
+	int audiobankOffset;
+	int max_dtw = 0;
+	int best_match;
+
+	// processing dtw
+	for ( ; j < 4 ; j ++ ) {
+		
+		printf("Performing DTW for %s\n", names[j]);
+		audiobankOffset = offset[j];
+		dtw_results[j] = dtw(input_audio, HelloByeYesNo, 0, audiobankOffset, NUM_DATA);
+		
+		if (dtw_results[j] > max_dtw) {
+			max_dtw = dtw_results[j] ;
+			best_match = j;
+		}
+	}
+
+	printf("I think you said %s!\n", names[j]);
+}
+
+	
+
     // Perform DTW
-    j = 0;
+    /* j = 0;
     for ( ; j < 2; j++) {
         short delay = audio_delays[j];
 
@@ -241,16 +286,19 @@ int main(void)
         else {
             dtw_results[j] = dtw(input_audio, audio_bank[best_index[j]], 0, delay, NUM_DATA - delay);
         }  
-    }
-    
+    } */
+
+
     //Print out the best match using UART
     //TODO: Tolerance level for a "match"
+/*
     if (dtw_results[0] > dtw_results[1]) {
         printf("The closest matched word was %s", audio_bank[best_index[0]]);
     }
     else {
         printf("The closest matched word was %s", audio_bank[best_index[1]]);
-    }
+    } */
+//}
 
     // PWM CODE BELOW
     //// Reset the index for playback
@@ -273,7 +321,7 @@ int main(void)
     //OC5CONbits.ON = 1;
     //
     // while (1) { }
-}
+
 
 //void __ISR(_TIMER_2_VECTOR, ipl7) T2_IntHandler (void)
 //{   

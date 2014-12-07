@@ -1,6 +1,6 @@
 Analysis & Synthesis report for speechrec
-Sat Dec 06 17:51:56 2014
-Quartus II 32-bit Version 12.0 Build 178 05/31/2012 SJ Web Edition
+Sat Dec 06 20:52:46 2014
+Quartus II 64-Bit Version 13.0.0 Build 156 04/24/2013 SJ Web Edition
 
 
 ---------------------
@@ -14,19 +14,20 @@ Quartus II 32-bit Version 12.0 Build 178 05/31/2012 SJ Web Edition
   6. Analysis & Synthesis Resource Usage Summary
   7. Analysis & Synthesis Resource Utilization by Entity
   8. Registers Removed During Synthesis
-  9. General Register Statistics
- 10. Multiplexer Restructuring Statistics (Restructuring Performed)
- 11. Port Connectivity Checks: "compile_audio:compiler"
- 12. Port Connectivity Checks: "spi_send_receive:comm"
- 13. Elapsed Time Per Partition
- 14. Analysis & Synthesis Messages
+  9. Removed Registers Triggering Further Register Optimizations
+ 10. General Register Statistics
+ 11. Multiplexer Restructuring Statistics (Restructuring Performed)
+ 12. Port Connectivity Checks: "compile_audio:compiler"
+ 13. Port Connectivity Checks: "spi_send_receive:comm"
+ 14. Elapsed Time Per Partition
+ 15. Analysis & Synthesis Messages
 
 
 
 ----------------
 ; Legal Notice ;
 ----------------
-Copyright (C) 1991-2012 Altera Corporation
+Copyright (C) 1991-2013 Altera Corporation
 Your use of Altera Corporation's design tools, logic functions 
 and other software and tools, and its AMPP partner logic 
 functions, and any output files from any of the foregoing 
@@ -42,24 +43,24 @@ applicable agreement for further details.
 
 
 
-+-------------------------------------------------------------------------------+
-; Analysis & Synthesis Summary                                                  ;
-+------------------------------------+------------------------------------------+
-; Analysis & Synthesis Status        ; Successful - Sat Dec 06 17:51:56 2014    ;
-; Quartus II 32-bit Version          ; 12.0 Build 178 05/31/2012 SJ Web Edition ;
-; Revision Name                      ; speechrec                                ;
-; Top-level Entity Name              ; speechrec                                ;
-; Family                             ; Cyclone III                              ;
-; Total logic elements               ; 119                                      ;
-;     Total combinational functions  ; 86                                       ;
-;     Dedicated logic registers      ; 85                                       ;
-; Total registers                    ; 85                                       ;
-; Total pins                         ; 17                                       ;
-; Total virtual pins                 ; 0                                        ;
-; Total memory bits                  ; 0                                        ;
-; Embedded Multiplier 9-bit elements ; 0                                        ;
-; Total PLLs                         ; 0                                        ;
-+------------------------------------+------------------------------------------+
++---------------------------------------------------------------------------------+
+; Analysis & Synthesis Summary                                                    ;
++------------------------------------+--------------------------------------------+
+; Analysis & Synthesis Status        ; Successful - Sat Dec 06 20:52:46 2014      ;
+; Quartus II 64-Bit Version          ; 13.0.0 Build 156 04/24/2013 SJ Web Edition ;
+; Revision Name                      ; speechrec                                  ;
+; Top-level Entity Name              ; speechrec                                  ;
+; Family                             ; Cyclone III                                ;
+; Total logic elements               ; 73                                         ;
+;     Total combinational functions  ; 72                                         ;
+;     Dedicated logic registers      ; 53                                         ;
+; Total registers                    ; 53                                         ;
+; Total pins                         ; 17                                         ;
+; Total virtual pins                 ; 0                                          ;
+; Total memory bits                  ; 0                                          ;
+; Embedded Multiplier 9-bit elements ; 0                                          ;
+; Total PLLs                         ; 0                                          ;
++------------------------------------+--------------------------------------------+
 
 
 +----------------------------------------------------------------------------------------------------------------------+
@@ -141,6 +142,7 @@ applicable agreement for further details.
 ; SDC constraint protection                                                  ; Off                ; Off                ;
 ; Synthesis Effort                                                           ; Auto               ; Auto               ;
 ; Shift Register Replacement - Allow Asynchronous Clear Signal               ; On                 ; On                 ;
+; Pre-Mapping Resynthesis Optimization                                       ; Off                ; Off                ;
 ; Analysis & Synthesis Message Level                                         ; Medium             ; Medium             ;
 ; Disable Register Merging Across Hierarchies                                ; Auto               ; Auto               ;
 ; Resource Aware Inference For Block RAM                                     ; On                 ; On                 ;
@@ -154,24 +156,24 @@ applicable agreement for further details.
 ; Processors                 ; Number      ;
 +----------------------------+-------------+
 ; Number detected on machine ; 4           ;
-; Maximum allowed            ; 4           ;
+; Maximum allowed            ; 2           ;
 ;                            ;             ;
 ; Average used               ; 1.00        ;
 ; Maximum used               ; 1           ;
 ;                            ;             ;
 ; Usage by Processor         ; % Time Used ;
-;     1 processor            ; 100.0%      ;
-;     2-4 processors         ;   0.0%      ;
+;     Processor 1            ; 100.0%      ;
+;     Processors 2-4         ;   0.0%      ;
 +----------------------------+-------------+
 
 
-+-----------------------------------------------------------------------------------------------------------------------------------------------------+
-; Analysis & Synthesis Source Files Read                                                                                                              ;
-+----------------------------------+-----------------+------------------------------+-------------------------------------------------------+---------+
-; File Name with User-Entered Path ; Used in Netlist ; File Type                    ; File Name with Absolute Path                          ; Library ;
-+----------------------------------+-----------------+------------------------------+-------------------------------------------------------+---------+
-; speechrec.sv                     ; yes             ; User SystemVerilog HDL File  ; C:/Users/mngai/Desktop/e155-final-master/speechrec.sv ;         ;
-+----------------------------------+-----------------+------------------------------+-------------------------------------------------------+---------+
++---------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Analysis & Synthesis Source Files Read                                                                                                                  ;
++----------------------------------+-----------------+------------------------------+-----------------------------------------------------------+---------+
+; File Name with User-Entered Path ; Used in Netlist ; File Type                    ; File Name with Absolute Path                              ; Library ;
++----------------------------------+-----------------+------------------------------+-----------------------------------------------------------+---------+
+; speechrec.sv                     ; yes             ; User SystemVerilog HDL File  ; C:/Users/strisorus/Desktop/e155-final-master/speechrec.sv ;         ;
++----------------------------------+-----------------+------------------------------+-----------------------------------------------------------+---------+
 
 
 +---------------------------------------------------------+
@@ -179,51 +181,74 @@ applicable agreement for further details.
 +---------------------------------------------+-----------+
 ; Resource                                    ; Usage     ;
 +---------------------------------------------+-----------+
-; Estimated Total logic elements              ; 119       ;
+; Estimated Total logic elements              ; 73        ;
 ;                                             ;           ;
-; Total combinational functions               ; 86        ;
+; Total combinational functions               ; 72        ;
 ; Logic element usage by number of LUT inputs ;           ;
-;     -- 4 input functions                    ; 22        ;
-;     -- 3 input functions                    ; 45        ;
+;     -- 4 input functions                    ; 12        ;
+;     -- 3 input functions                    ; 41        ;
 ;     -- <=2 input functions                  ; 19        ;
 ;                                             ;           ;
 ; Logic elements by mode                      ;           ;
-;     -- normal mode                          ; 72        ;
+;     -- normal mode                          ; 58        ;
 ;     -- arithmetic mode                      ; 14        ;
 ;                                             ;           ;
-; Total registers                             ; 85        ;
-;     -- Dedicated logic registers            ; 85        ;
+; Total registers                             ; 53        ;
+;     -- Dedicated logic registers            ; 53        ;
 ;     -- I/O registers                        ; 0         ;
 ;                                             ;           ;
 ; I/O pins                                    ; 17        ;
+; Embedded Multiplier 9-bit elements          ; 0         ;
 ; Maximum fan-out node                        ; sck~input ;
-; Maximum fan-out                             ; 70        ;
-; Total fan-out                               ; 521       ;
-; Average fan-out                             ; 2.54      ;
+; Maximum fan-out                             ; 38        ;
+; Total fan-out                               ; 372       ;
+; Average fan-out                             ; 2.34      ;
 +---------------------------------------------+-----------+
 
 
-+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-; Analysis & Synthesis Resource Utilization by Entity                                                                                                                                          ;
-+------------------------------+-------------------+--------------+-------------+--------------+---------+-----------+------+--------------+------------------------------------+--------------+
-; Compilation Hierarchy Node   ; LC Combinationals ; LC Registers ; Memory Bits ; DSP Elements ; DSP 9x9 ; DSP 18x18 ; Pins ; Virtual Pins ; Full Hierarchy Name                ; Library Name ;
-+------------------------------+-------------------+--------------+-------------+--------------+---------+-----------+------+--------------+------------------------------------+--------------+
-; |speechrec                   ; 86 (12)           ; 85 (3)       ; 0           ; 0            ; 0       ; 0         ; 17   ; 0            ; |speechrec                         ;              ;
-;    |compare_signals:checker| ; 12 (12)           ; 0 (0)        ; 0           ; 0            ; 0       ; 0         ; 0    ; 0            ; |speechrec|compare_signals:checker ;              ;
-;    |compile_audio:compiler|  ; 18 (18)           ; 12 (12)      ; 0           ; 0            ; 0       ; 0         ; 0    ; 0            ; |speechrec|compile_audio:compiler  ;              ;
-;    |spi_send_receive:comm|   ; 44 (44)           ; 70 (70)      ; 0           ; 0            ; 0       ; 0         ; 0    ; 0            ; |speechrec|spi_send_receive:comm   ;              ;
-+------------------------------+-------------------+--------------+-------------+--------------+---------+-----------+------+--------------+------------------------------------+--------------+
++--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Analysis & Synthesis Resource Utilization by Entity                                                                                                                                        ;
++-----------------------------+-------------------+--------------+-------------+--------------+---------+-----------+------+--------------+-----------------------------------+--------------+
+; Compilation Hierarchy Node  ; LC Combinationals ; LC Registers ; Memory Bits ; DSP Elements ; DSP 9x9 ; DSP 18x18 ; Pins ; Virtual Pins ; Full Hierarchy Name               ; Library Name ;
++-----------------------------+-------------------+--------------+-------------+--------------+---------+-----------+------+--------------+-----------------------------------+--------------+
+; |speechrec                  ; 72 (12)           ; 53 (3)       ; 0           ; 0            ; 0       ; 0         ; 17   ; 0            ; |speechrec                        ;              ;
+;    |compile_audio:compiler| ; 17 (17)           ; 12 (12)      ; 0           ; 0            ; 0       ; 0         ; 0    ; 0            ; |speechrec|compile_audio:compiler ;              ;
+;    |spi_send_receive:comm|  ; 43 (43)           ; 38 (38)      ; 0           ; 0            ; 0       ; 0         ; 0    ; 0            ; |speechrec|spi_send_receive:comm  ;              ;
++-----------------------------+-------------------+--------------+-------------+--------------+---------+-----------+------+--------------+-----------------------------------+--------------+
 Note: For table entries with two numbers listed, the numbers in parentheses indicate the number of resources of the given type used by the specific entity alone. The numbers listed outside of parentheses indicate the total resources of the given type used by the specific entity and all of its sub-entities in the hierarchy.
 
 
-+--------------------------------------------------------------------------------+
-; Registers Removed During Synthesis                                             ;
-+---------------------------------------+----------------------------------------+
-; Register name                         ; Reason for Removal                     ;
-+---------------------------------------+----------------------------------------+
-; state[3]                              ; Stuck at GND due to stuck port data_in ;
-; Total Number of Removed Registers = 1 ;                                        ;
-+---------------------------------------+----------------------------------------+
++---------------------------------------------------------------------------------+
+; Registers Removed During Synthesis                                              ;
++----------------------------------------+----------------------------------------+
+; Register name                          ; Reason for Removal                     ;
++----------------------------------------+----------------------------------------+
+; state[3]                               ; Stuck at GND due to stuck port data_in ;
+; spi_send_receive:comm|q[0..31]         ; Lost fanout                            ;
+; Total Number of Removed Registers = 33 ;                                        ;
++----------------------------------------+----------------------------------------+
+
+
++-----------------------------------------------------------------------------------------------------------------------------------+
+; Removed Registers Triggering Further Register Optimizations                                                                       ;
++---------------+---------------------------+---------------------------------------------------------------------------------------+
+; Register name ; Reason for Removal        ; Registers Removed due to This Register                                                ;
++---------------+---------------------------+---------------------------------------------------------------------------------------+
+; state[3]      ; Stuck at GND              ; spi_send_receive:comm|q[8], spi_send_receive:comm|q[7], spi_send_receive:comm|q[6],   ;
+;               ; due to stuck port data_in ; spi_send_receive:comm|q[5], spi_send_receive:comm|q[4], spi_send_receive:comm|q[3],   ;
+;               ;                           ; spi_send_receive:comm|q[25], spi_send_receive:comm|q[1], spi_send_receive:comm|q[0],  ;
+;               ;                           ; spi_send_receive:comm|q[31], spi_send_receive:comm|q[30],                             ;
+;               ;                           ; spi_send_receive:comm|q[29], spi_send_receive:comm|q[28], spi_send_receive:comm|q[2], ;
+;               ;                           ; spi_send_receive:comm|q[27], spi_send_receive:comm|q[26],                             ;
+;               ;                           ; spi_send_receive:comm|q[24], spi_send_receive:comm|q[23],                             ;
+;               ;                           ; spi_send_receive:comm|q[22], spi_send_receive:comm|q[20],                             ;
+;               ;                           ; spi_send_receive:comm|q[19], spi_send_receive:comm|q[18],                             ;
+;               ;                           ; spi_send_receive:comm|q[17], spi_send_receive:comm|q[16],                             ;
+;               ;                           ; spi_send_receive:comm|q[21], spi_send_receive:comm|q[15],                             ;
+;               ;                           ; spi_send_receive:comm|q[14], spi_send_receive:comm|q[13], spi_send_receive:comm|q[9], ;
+;               ;                           ; spi_send_receive:comm|q[12], spi_send_receive:comm|q[11],                             ;
+;               ;                           ; spi_send_receive:comm|q[10]                                                           ;
++---------------+---------------------------+---------------------------------------------------------------------------------------+
 
 
 +------------------------------------------------------+
@@ -231,24 +256,24 @@ Note: For table entries with two numbers listed, the numbers in parentheses indi
 +----------------------------------------------+-------+
 ; Statistic                                    ; Value ;
 +----------------------------------------------+-------+
-; Total registers                              ; 85    ;
+; Total registers                              ; 53    ;
 ; Number of registers using Synchronous Clear  ; 16    ;
 ; Number of registers using Synchronous Load   ; 0     ;
 ; Number of registers using Asynchronous Clear ; 0     ;
 ; Number of registers using Asynchronous Load  ; 0     ;
-; Number of registers using Clock Enable       ; 48    ;
+; Number of registers using Clock Enable       ; 16    ;
 ; Number of registers using Preset             ; 0     ;
 +----------------------------------------------+-------+
 
 
-+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-; Multiplexer Restructuring Statistics (Restructuring Performed)                                                                                                          ;
-+--------------------+-----------+---------------+----------------------+------------------------+-------------------------------------------+----------------------------+
-; Multiplexer Inputs ; Bus Width ; Baseline Area ; Area if Restructured ; Saving if Restructured ; Registered                                ; Example Multiplexer Output ;
-+--------------------+-----------+---------------+----------------------+------------------------+-------------------------------------------+----------------------------+
-; 3:1                ; 11 bits   ; 22 LEs        ; 11 LEs               ; 11 LEs                 ; |speechrec|compile_audio:compiler|cnt[10] ;                            ;
-; 3:1                ; 5 bits    ; 10 LEs        ; 5 LEs                ; 5 LEs                  ; |speechrec|spi_send_receive:comm|cnt[0]   ;                            ;
-+--------------------+-----------+---------------+----------------------+------------------------+-------------------------------------------+----------------------------+
++--------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Multiplexer Restructuring Statistics (Restructuring Performed)                                                                                         ;
++--------------------+-----------+---------------+----------------------+------------------------+------------+------------------------------------------+
+; Multiplexer Inputs ; Bus Width ; Baseline Area ; Area if Restructured ; Saving if Restructured ; Registered ; Example Multiplexer Output               ;
++--------------------+-----------+---------------+----------------------+------------------------+------------+------------------------------------------+
+; 3:1                ; 11 bits   ; 22 LEs        ; 11 LEs               ; 11 LEs                 ; Yes        ; |speechrec|compile_audio:compiler|cnt[0] ;
+; 3:1                ; 5 bits    ; 10 LEs        ; 5 LEs                ; 5 LEs                  ; Yes        ; |speechrec|spi_send_receive:comm|cnt[0]  ;
++--------------------+-----------+---------------+----------------------+------------------------+------------+------------------------------------------+
 
 
 +----------------------------------------------------------------------------------------------------------------------+
@@ -290,11 +315,11 @@ Note: For table entries with two numbers listed, the numbers in parentheses indi
 ; Analysis & Synthesis Messages ;
 +-------------------------------+
 Info: *******************************************************************
-Info: Running Quartus II 32-bit Analysis & Synthesis
-    Info: Version 12.0 Build 178 05/31/2012 SJ Web Edition
-    Info: Processing started: Sat Dec 06 17:51:47 2014
+Info: Running Quartus II 64-Bit Analysis & Synthesis
+    Info: Version 13.0.0 Build 156 04/24/2013 SJ Web Edition
+    Info: Processing started: Sat Dec 06 20:52:41 2014
 Info: Command: quartus_map --read_settings_files=on --write_settings_files=off speechrec -c speechrec
-Info (20030): Parallel compilation is enabled and will use 4 of the 4 processors detected
+Info (11104): Parallel Compilation has detected 4 hyper-threaded processors. However, the extra hyper-threaded processors will not be used by default. Parallel Compilation will use 2 of the 2 physical processors detected instead.
 Info (12021): Found 4 design units, including 4 entities, in source file speechrec.sv
     Info (12023): Found entity 1: speechrec
     Info (12023): Found entity 2: compare_signals
@@ -309,24 +334,26 @@ Info (12021): Found 1 design units, including 1 entities, in source file store.s
 Warning (10236): Verilog HDL Implicit Net warning at compareFromBank.sv(37): created implicit net for "maxresultTwo"
 Info (12127): Elaborating entity "speechrec" for the top level hierarchy
 Warning (10036): Verilog HDL or VHDL warning at speechrec.sv(26): object "audio" assigned a value but never read
-Warning (10036): Verilog HDL or VHDL warning at speechrec.sv(70): object "res" assigned a value but never read
+Warning (10036): Verilog HDL or VHDL warning at speechrec.sv(73): object "res" assigned a value but never read
 Warning (10230): Verilog HDL assignment warning at speechrec.sv(55): truncated value with size 5 to match size of target (4)
 Info (12128): Elaborating entity "spi_send_receive" for hierarchy "spi_send_receive:comm"
 Info (12128): Elaborating entity "compile_audio" for hierarchy "compile_audio:compiler"
 Info (12128): Elaborating entity "compare_signals" for hierarchy "compare_signals:checker"
 Warning (13024): Output pins are stuck at VCC or GND
     Warning (13410): Pin "led[3]" is stuck at GND
+    Warning (13410): Pin "data_confirmed" is stuck at GND
 Info (286030): Timing-Driven Synthesis is running
+Info (17049): 32 registers lost all their fanouts during netlist optimizations.
 Info (16010): Generating hard_block partition "hard_block:auto_generated_inst"
     Info (16011): Adding 0 node(s), including 0 DDIO, 0 PLL, 0 transceiver and 0 LCELL
-Info (21057): Implemented 136 device resources after synthesis - the final resource count might be different
+Info (21057): Implemented 90 device resources after synthesis - the final resource count might be different
     Info (21058): Implemented 5 input pins
     Info (21059): Implemented 12 output pins
-    Info (21061): Implemented 119 logic cells
-Info: Quartus II 32-bit Analysis & Synthesis was successful. 0 errors, 6 warnings
-    Info: Peak virtual memory: 437 megabytes
-    Info: Processing ended: Sat Dec 06 17:51:56 2014
-    Info: Elapsed time: 00:00:09
-    Info: Total CPU time (on all processors): 00:00:10
+    Info (21061): Implemented 73 logic cells
+Info: Quartus II 64-Bit Analysis & Synthesis was successful. 0 errors, 7 warnings
+    Info: Peak virtual memory: 519 megabytes
+    Info: Processing ended: Sat Dec 06 20:52:46 2014
+    Info: Elapsed time: 00:00:05
+    Info: Total CPU time (on all processors): 00:00:05
 
 

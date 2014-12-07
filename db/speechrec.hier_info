@@ -60256,9 +60256,9 @@ cnt[10] <= cnt[10]~reg0.DB_MAX_OUTPUT_PORT_TYPE
 
 |speechrec|compare_signals:checker
 state[0] => Equal0.IN3
-state[1] => Equal0.IN1
-state[2] => Equal0.IN0
-state[3] => Equal0.IN2
+state[1] => Equal0.IN2
+state[2] => Equal0.IN1
+state[3] => Equal0.IN0
 sent[0] => Equal1.IN31
 sent[1] => Equal1.IN30
 sent[2] => Equal1.IN29

@@ -40,7 +40,7 @@ module speechrec(input  logic       clk, sck, sdi, ss, reset,
     always_comb begin
         case(state)
             S0: nextstate =      	    ss ? S1 : S0; // S0: Wait for master to send input audio
-            S1: nextstate = 		  input_ready ? S3 : S1;	//input_ready ? S3 : S1; // S1: Receive the audio
+            S1: nextstate =		input_ready ? S3 : S1;	//S1: Receive the audio
             S2: nextstate = transmit_ready ? S3 : S2; // S2: Process the audio
             S3: nextstate =             ss ? S4 : S3; // S3: Wait for master to be ready
             S4: nextstate = 				~ss ? S5 : S4; // S4: Transmit the results data
@@ -53,6 +53,9 @@ module speechrec(input  logic       clk, sck, sdi, ss, reset,
     
 	 assign led[3:0] = state;
 	 assign led[7:4] = cnt[4:0];
+	 
+	 logic [31:0] compare_receive;
+	 
 	 
    // spi_send_receive receiver(state, sck, sdo, sdi, reset, junk_send, data_receive, input_ready);
 	// spi_send_receive receiver(state, sck, sdi, sdo, reset, data_send, data_receive);
@@ -70,7 +73,7 @@ module speechrec(input  logic       clk, sck, sdi, ss, reset,
 	logic [9:0] res;
 	assign res = 10'b1010101010;
 	assign data_send = 32'h00001111;
-  assign compare_receive = ((state == S6) && data_exchanged)? data_received : 32'b0;
+  assign compare_receive = ((state == S6) && data_exchanged)? data_receive : 32'b0;
 
 	
     //assign led = data_receive;

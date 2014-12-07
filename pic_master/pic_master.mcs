@@ -2,7 +2,7 @@
 MagicCookie={0b13fe8c-dfe0-40eb-8900-6712719559a7}
 Version=1.0
 [File000]
-Location=C:\Users\strisorus\Downloads\e155-final-master\e155-final-master\pic_master\pic_master_adc_basic.o
+Location=C:\Users\strisorus\Desktop\e155-final-master\pic_master\pic_master_adc_basic.o
 Folder=Intermediary
 DeviceName=PIC32MX675F512H
 LanguageToolSuiteID={14495C23-81F8-43F3-8A44-859C583D7760}
@@ -15,59 +15,20 @@ ToolArgsString=-g
 TraceCmdString=
 DebugOptions=-D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1
 [File001]
-Location=C:\Users\mngai\Desktop\e155-final-master\pic_master\pic_master_adc_basic.o
-Folder=Intermediary
+Location=C:\Users\strisorus\Desktop\e155-final-master\pic_master\pic_master.elf
+Folder=Output
 DeviceName=PIC32MX675F512H
 LanguageToolSuiteID={14495C23-81F8-43F3-8A44-859C583D7760}
-LanguageToolID={430F471F-7ECB-4852-A80D-DEF9A5C8E751}
-LanguageToolLocation=C:\Program Files (x86)\Microchip\MPLAB C32 Suite\bin\pic32-gcc.exe
+LanguageToolID={C68E5105-1196-4333-A0BF-3DC57271E614}
+LanguageToolLocation=C:\Program Files (x86)\Microchip\MPLAB C32 Suite\bin\pic32-ld.exe
 PPAD=$(BINDIR)||$(TMPDIR)||$(AINDIR)||$(INCDIR)||$(LIBDIR)|C:\Program Files (x86)\Microchip\MPLAB C32 Suite\lib;C:\Program Files (x86)\Microchip\MPLAB C32 Suite\pic32mx\lib;||$(LKRDIR)||
 SOLK=<src>|pic_master_adc_basic.c||<obj>||<lib>||<lkr>||
 SuiteArgsString=
-ToolArgsString=-g
+ToolArgsString=-o"$(BINDIR_)$(TARGETBASE).$(TARGETSUFFIX)" -Map="$(BINDIR_)$(TARGETBASE).map"
 TraceCmdString=
-DebugOptions=-D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1
+DebugOptions=--defsym=__MPLAB_DEBUG=1 --defsym=__MPLAB_DEBUGGER_ICD3=1 --defsym=__ICD2RAM=1
 [File002]
-Location=C:\Users\strisorus\Downloads\e155-final-master\e155-final-master\pic_master\pic_master.elf
-Folder=Output
-DeviceName=PIC32MX675F512H
-LanguageToolSuiteID={14495C23-81F8-43F3-8A44-859C583D7760}
-LanguageToolID={C68E5105-1196-4333-A0BF-3DC57271E614}
-LanguageToolLocation=C:\Program Files (x86)\Microchip\MPLAB C32 Suite\bin\pic32-ld.exe
-PPAD=$(BINDIR)||$(TMPDIR)||$(AINDIR)||$(INCDIR)||$(LIBDIR)|C:\Program Files (x86)\Microchip\MPLAB C32 Suite\lib;C:\Program Files (x86)\Microchip\MPLAB C32 Suite\pic32mx\lib;||$(LKRDIR)||
-SOLK=<src>|pic_master_adc_basic.c||<obj>||<lib>||<lkr>||
-SuiteArgsString=
-ToolArgsString=-o"$(BINDIR_)$(TARGETBASE).$(TARGETSUFFIX)" -Map="$(BINDIR_)$(TARGETBASE).map"
-TraceCmdString=
-DebugOptions=--defsym=__MPLAB_DEBUG=1 --defsym=__MPLAB_DEBUGGER_ICD3=1 --defsym=__ICD2RAM=1
-[File003]
-Location=C:\Users\strisorus\Downloads\e155-final-master\e155-final-master\pic_master\pic_master.hex
-Folder=Output
-DeviceName=PIC32MX675F512H
-LanguageToolSuiteID={14495C23-81F8-43F3-8A44-859C583D7760}
-LanguageToolID={C68E5105-1196-4333-A0BF-3DC57271E614}
-LanguageToolLocation=C:\Program Files (x86)\Microchip\MPLAB C32 Suite\bin\pic32-ld.exe
-PPAD=$(BINDIR)||$(TMPDIR)||$(AINDIR)||$(INCDIR)||$(LIBDIR)|C:\Program Files (x86)\Microchip\MPLAB C32 Suite\lib;C:\Program Files (x86)\Microchip\MPLAB C32 Suite\pic32mx\lib;||$(LKRDIR)||
-SOLK=<src>|pic_master_adc_basic.c||<obj>||<lib>||<lkr>||
-SuiteArgsString=
-ToolArgsString=-o"$(BINDIR_)$(TARGETBASE).$(TARGETSUFFIX)" -Map="$(BINDIR_)$(TARGETBASE).map"
-TraceCmdString=
-DebugOptions=--defsym=__MPLAB_DEBUG=1 --defsym=__MPLAB_DEBUGGER_ICD3=1 --defsym=__ICD2RAM=1
-[File004]
-Location=C:\Users\mngai\Desktop\e155-final-master\pic_master\pic_master.elf
-Folder=Output
-DeviceName=PIC32MX675F512H
-LanguageToolSuiteID={14495C23-81F8-43F3-8A44-859C583D7760}
-LanguageToolID={C68E5105-1196-4333-A0BF-3DC57271E614}
-LanguageToolLocation=C:\Program Files (x86)\Microchip\MPLAB C32 Suite\bin\pic32-ld.exe
-PPAD=$(BINDIR)||$(TMPDIR)||$(AINDIR)||$(INCDIR)||$(LIBDIR)|C:\Program Files (x86)\Microchip\MPLAB C32 Suite\lib;C:\Program Files (x86)\Microchip\MPLAB C32 Suite\pic32mx\lib;||$(LKRDIR)||
-SOLK=<src>|pic_master_adc_basic.c||<obj>||<lib>||<lkr>||
-SuiteArgsString=
-ToolArgsString=-o"$(BINDIR_)$(TARGETBASE).$(TARGETSUFFIX)" -Map="$(BINDIR_)$(TARGETBASE).map"
-TraceCmdString=
-DebugOptions=--defsym=__MPLAB_DEBUG=1 --defsym=__MPLAB_DEBUGGER_ICD3=1 --defsym=__ICD2RAM=1
-[File005]
-Location=C:\Users\mngai\Desktop\e155-final-master\pic_master\pic_master.hex
+Location=C:\Users\strisorus\Desktop\e155-final-master\pic_master\pic_master.hex
 Folder=Output
 DeviceName=PIC32MX675F512H
 LanguageToolSuiteID={14495C23-81F8-43F3-8A44-859C583D7760}
