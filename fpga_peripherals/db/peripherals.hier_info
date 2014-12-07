@@ -1,0 +1,104 @@
+|peripherals
+clk => clk.IN1
+sck => sck.IN1
+sdi => sdi.IN1
+ss => ~NO_FANOUT~
+reset => reset.IN1
+sdo <= spi_send_receive:spi.port3
+bar_R[0] <= display_bargraph:displayer.port6
+bar_R[1] <= display_bargraph:displayer.port6
+bar_R[2] <= display_bargraph:displayer.port6
+bar_R[3] <= display_bargraph:displayer.port6
+bar_G[0] <= display_bargraph:displayer.port7
+bar_G[1] <= display_bargraph:displayer.port7
+bar_G[2] <= display_bargraph:displayer.port7
+bar_G[3] <= display_bargraph:displayer.port7
+led_rdy <= ready_to_listen.DB_MAX_OUTPUT_PORT_TYPE
+led_rec <= listening.DB_MAX_OUTPUT_PORT_TYPE
+led_R <= led_R.DB_MAX_OUTPUT_PORT_TYPE
+led_G <= led_G.DB_MAX_OUTPUT_PORT_TYPE
+led_Y <= led_Y.DB_MAX_OUTPUT_PORT_TYPE
+led_O <= led_O.DB_MAX_OUTPUT_PORT_TYPE
+sys_state[0] <= sys_state.DB_MAX_OUTPUT_PORT_TYPE
+sys_state[1] <= sys_state.DB_MAX_OUTPUT_PORT_TYPE
+sys_state[2] <= sys_state.DB_MAX_OUTPUT_PORT_TYPE
+sys_state[3] <= sys_state.DB_MAX_OUTPUT_PORT_TYPE
+sys_state[4] <= sys_state.DB_MAX_OUTPUT_PORT_TYPE
+sys_state[5] <= sys_state.DB_MAX_OUTPUT_PORT_TYPE
+sys_state[6] <= sys_state.DB_MAX_OUTPUT_PORT_TYPE
+sys_state[7] <= sys_state.DB_MAX_OUTPUT_PORT_TYPE
+
+
+|peripherals|spi_send_receive:spi
+state => ~NO_FANOUT~
+sck => buffer[0].CLK
+sck => buffer[1].CLK
+sck => buffer[2].CLK
+sck => buffer[3].CLK
+sck => buffer[4].CLK
+sck => buffer[5].CLK
+sck => buffer[6].CLK
+sck => buffer[7].CLK
+sck => q[0]~reg0.CLK
+sck => q[1]~reg0.CLK
+sck => q[2]~reg0.CLK
+sck => q[3]~reg0.CLK
+sck => q[4]~reg0.CLK
+sck => q[5]~reg0.CLK
+sck => q[6]~reg0.CLK
+sck => q[7]~reg0.CLK
+sck => cnt[0].CLK
+sck => cnt[1].CLK
+sck => cnt[2].CLK
+sck => qdelayed.CLK
+sdi => buffer.DATAA
+sdo <= sdo.DB_MAX_OUTPUT_PORT_TYPE
+d[0] => buffer.DATAB
+d[1] => buffer.DATAB
+d[2] => buffer.DATAB
+d[3] => buffer.DATAB
+d[4] => buffer.DATAB
+d[5] => buffer.DATAB
+d[6] => buffer.DATAB
+d[7] => buffer.DATAB
+d[7] => sdo.DATAB
+q[0] <= q[0]~reg0.DB_MAX_OUTPUT_PORT_TYPE
+q[1] <= q[1]~reg0.DB_MAX_OUTPUT_PORT_TYPE
+q[2] <= q[2]~reg0.DB_MAX_OUTPUT_PORT_TYPE
+q[3] <= q[3]~reg0.DB_MAX_OUTPUT_PORT_TYPE
+q[4] <= q[4]~reg0.DB_MAX_OUTPUT_PORT_TYPE
+q[5] <= q[5]~reg0.DB_MAX_OUTPUT_PORT_TYPE
+q[6] <= q[6]~reg0.DB_MAX_OUTPUT_PORT_TYPE
+q[7] <= q[7]~reg0.DB_MAX_OUTPUT_PORT_TYPE
+data_exchanged <= <GND>
+
+
+|peripherals|display_bargraph:displayer
+clk => cnt[0].CLK
+clk => cnt[1].CLK
+clk => cnt[2].CLK
+reset => always0.IN0
+reset => cnt.OUTPUTSELECT
+reset => cnt.OUTPUTSELECT
+reset => cnt.OUTPUTSELECT
+ready_to_listen => always0.IN1
+listening => always0.IN1
+processing => ~NO_FANOUT~
+done => bar_R.OUTPUTSELECT
+done => bar_R.OUTPUTSELECT
+done => bar_R.OUTPUTSELECT
+done => bar_R.OUTPUTSELECT
+done => bar_G.DATAA
+done => bar_G.DATAA
+done => bar_G.DATAA
+done => bar_G.DATAA
+bar_R[0] <= bar_R.DB_MAX_OUTPUT_PORT_TYPE
+bar_R[1] <= bar_R.DB_MAX_OUTPUT_PORT_TYPE
+bar_R[2] <= bar_R.DB_MAX_OUTPUT_PORT_TYPE
+bar_R[3] <= bar_R.DB_MAX_OUTPUT_PORT_TYPE
+bar_G[0] <= bar_G.DB_MAX_OUTPUT_PORT_TYPE
+bar_G[1] <= bar_G.DB_MAX_OUTPUT_PORT_TYPE
+bar_G[2] <= bar_G.DB_MAX_OUTPUT_PORT_TYPE
+bar_G[3] <= bar_G.DB_MAX_OUTPUT_PORT_TYPE
+
+
