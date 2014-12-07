@@ -1,6 +1,6 @@
 EDA Netlist Writer report for speechrec
-Fri Dec 05 23:20:46 2014
-Quartus II 64-Bit Version 13.0.0 Build 156 04/24/2013 SJ Web Edition
+Sat Dec 06 17:52:11 2014
+Quartus II 32-bit Version 12.0 Build 178 05/31/2012 SJ Web Edition
 
 
 ---------------------
@@ -17,7 +17,7 @@ Quartus II 64-Bit Version 13.0.0 Build 156 04/24/2013 SJ Web Edition
 ----------------
 ; Legal Notice ;
 ----------------
-Copyright (C) 1991-2013 Altera Corporation
+Copyright (C) 1991-2012 Altera Corporation
 Your use of Altera Corporation's design tools, logic functions 
 and other software and tools, and its AMPP partner logic 
 functions, and any output files from any of the foregoing 
@@ -36,7 +36,7 @@ applicable agreement for further details.
 +-------------------------------------------------------------------+
 ; EDA Netlist Writer Summary                                        ;
 +---------------------------+---------------------------------------+
-; EDA Netlist Writer Status ; Successful - Fri Dec 05 23:20:46 2014 ;
+; EDA Netlist Writer Status ; Successful - Sat Dec 06 17:52:11 2014 ;
 ; Revision Name             ; speechrec                             ;
 ; Top-level Entity Name     ; speechrec                             ;
 ; Family                    ; Cyclone III                           ;
@@ -66,42 +66,42 @@ applicable agreement for further details.
 +---------------------------------------------------------------------------------------------------+---------------------------------+
 
 
-+-------------------------------------------------------------------------------------------------------------------------------------------------------+
-; Simulation Generated Files                                                                                                                            ;
-+-------------------------------------------------------------------------------------------------------------------------------------------------------+
-; Generated Files                                                                                                                                       ;
-+-------------------------------------------------------------------------------------------------------------------------------------------------------+
-; //charlie.ac.hmc.edu/HMC_2016/strisorus/E155/Final Project/e155-final-master/e155-final-master/simulation/modelsim/speechrec_8_1200mv_85c_slow.svo    ;
-; //charlie.ac.hmc.edu/HMC_2016/strisorus/E155/Final Project/e155-final-master/e155-final-master/simulation/modelsim/speechrec_8_1200mv_0c_slow.svo     ;
-; //charlie.ac.hmc.edu/HMC_2016/strisorus/E155/Final Project/e155-final-master/e155-final-master/simulation/modelsim/speechrec_min_1200mv_0c_fast.svo   ;
-; //charlie.ac.hmc.edu/HMC_2016/strisorus/E155/Final Project/e155-final-master/e155-final-master/simulation/modelsim/speechrec.svo                      ;
-; //charlie.ac.hmc.edu/HMC_2016/strisorus/E155/Final Project/e155-final-master/e155-final-master/simulation/modelsim/speechrec_8_1200mv_85c_v_slow.sdo  ;
-; //charlie.ac.hmc.edu/HMC_2016/strisorus/E155/Final Project/e155-final-master/e155-final-master/simulation/modelsim/speechrec_8_1200mv_0c_v_slow.sdo   ;
-; //charlie.ac.hmc.edu/HMC_2016/strisorus/E155/Final Project/e155-final-master/e155-final-master/simulation/modelsim/speechrec_min_1200mv_0c_v_fast.sdo ;
-; //charlie.ac.hmc.edu/HMC_2016/strisorus/E155/Final Project/e155-final-master/e155-final-master/simulation/modelsim/speechrec_v.sdo                    ;
-+-------------------------------------------------------------------------------------------------------------------------------------------------------+
++-------------------------------------------------------------------------------------------------+
+; Simulation Generated Files                                                                      ;
++-------------------------------------------------------------------------------------------------+
+; Generated Files                                                                                 ;
++-------------------------------------------------------------------------------------------------+
+; C:/Users/mngai/Desktop/e155-final-master/simulation/modelsim/speechrec_8_1200mv_85c_slow.svo    ;
+; C:/Users/mngai/Desktop/e155-final-master/simulation/modelsim/speechrec_8_1200mv_0c_slow.svo     ;
+; C:/Users/mngai/Desktop/e155-final-master/simulation/modelsim/speechrec_min_1200mv_0c_fast.svo   ;
+; C:/Users/mngai/Desktop/e155-final-master/simulation/modelsim/speechrec.svo                      ;
+; C:/Users/mngai/Desktop/e155-final-master/simulation/modelsim/speechrec_8_1200mv_85c_v_slow.sdo  ;
+; C:/Users/mngai/Desktop/e155-final-master/simulation/modelsim/speechrec_8_1200mv_0c_v_slow.sdo   ;
+; C:/Users/mngai/Desktop/e155-final-master/simulation/modelsim/speechrec_min_1200mv_0c_v_fast.sdo ;
+; C:/Users/mngai/Desktop/e155-final-master/simulation/modelsim/speechrec_v.sdo                    ;
++-------------------------------------------------------------------------------------------------+
 
 
 +-----------------------------+
 ; EDA Netlist Writer Messages ;
 +-----------------------------+
 Info: *******************************************************************
-Info: Running Quartus II 64-Bit EDA Netlist Writer
-    Info: Version 13.0.0 Build 156 04/24/2013 SJ Web Edition
-    Info: Processing started: Fri Dec 05 23:20:45 2014
+Info: Running Quartus II 32-bit EDA Netlist Writer
+    Info: Version 12.0 Build 178 05/31/2012 SJ Web Edition
+    Info: Processing started: Sat Dec 06 17:52:10 2014
 Info: Command: quartus_eda --read_settings_files=off --write_settings_files=off speechrec -c speechrec
-Info (204019): Generated file speechrec_8_1200mv_85c_slow.svo in folder "//charlie.ac.hmc.edu/HMC_2016/strisorus/E155/Final Project/e155-final-master/e155-final-master/simulation/modelsim/" for EDA simulation tool
-Info (204019): Generated file speechrec_8_1200mv_0c_slow.svo in folder "//charlie.ac.hmc.edu/HMC_2016/strisorus/E155/Final Project/e155-final-master/e155-final-master/simulation/modelsim/" for EDA simulation tool
-Info (204019): Generated file speechrec_min_1200mv_0c_fast.svo in folder "//charlie.ac.hmc.edu/HMC_2016/strisorus/E155/Final Project/e155-final-master/e155-final-master/simulation/modelsim/" for EDA simulation tool
-Info (204019): Generated file speechrec.svo in folder "//charlie.ac.hmc.edu/HMC_2016/strisorus/E155/Final Project/e155-final-master/e155-final-master/simulation/modelsim/" for EDA simulation tool
-Info (204019): Generated file speechrec_8_1200mv_85c_v_slow.sdo in folder "//charlie.ac.hmc.edu/HMC_2016/strisorus/E155/Final Project/e155-final-master/e155-final-master/simulation/modelsim/" for EDA simulation tool
-Info (204019): Generated file speechrec_8_1200mv_0c_v_slow.sdo in folder "//charlie.ac.hmc.edu/HMC_2016/strisorus/E155/Final Project/e155-final-master/e155-final-master/simulation/modelsim/" for EDA simulation tool
-Info (204019): Generated file speechrec_min_1200mv_0c_v_fast.sdo in folder "//charlie.ac.hmc.edu/HMC_2016/strisorus/E155/Final Project/e155-final-master/e155-final-master/simulation/modelsim/" for EDA simulation tool
-Info (204019): Generated file speechrec_v.sdo in folder "//charlie.ac.hmc.edu/HMC_2016/strisorus/E155/Final Project/e155-final-master/e155-final-master/simulation/modelsim/" for EDA simulation tool
-Info: Quartus II 64-Bit EDA Netlist Writer was successful. 0 errors, 0 warnings
-    Info: Peak virtual memory: 391 megabytes
-    Info: Processing ended: Fri Dec 05 23:20:46 2014
-    Info: Elapsed time: 00:00:01
+Info (204019): Generated file speechrec_8_1200mv_85c_slow.svo in folder "C:/Users/mngai/Desktop/e155-final-master/simulation/modelsim/" for EDA simulation tool
+Info (204019): Generated file speechrec_8_1200mv_0c_slow.svo in folder "C:/Users/mngai/Desktop/e155-final-master/simulation/modelsim/" for EDA simulation tool
+Info (204019): Generated file speechrec_min_1200mv_0c_fast.svo in folder "C:/Users/mngai/Desktop/e155-final-master/simulation/modelsim/" for EDA simulation tool
+Info (204019): Generated file speechrec.svo in folder "C:/Users/mngai/Desktop/e155-final-master/simulation/modelsim/" for EDA simulation tool
+Info (204019): Generated file speechrec_8_1200mv_85c_v_slow.sdo in folder "C:/Users/mngai/Desktop/e155-final-master/simulation/modelsim/" for EDA simulation tool
+Info (204019): Generated file speechrec_8_1200mv_0c_v_slow.sdo in folder "C:/Users/mngai/Desktop/e155-final-master/simulation/modelsim/" for EDA simulation tool
+Info (204019): Generated file speechrec_min_1200mv_0c_v_fast.sdo in folder "C:/Users/mngai/Desktop/e155-final-master/simulation/modelsim/" for EDA simulation tool
+Info (204019): Generated file speechrec_v.sdo in folder "C:/Users/mngai/Desktop/e155-final-master/simulation/modelsim/" for EDA simulation tool
+Info: Quartus II 32-bit EDA Netlist Writer was successful. 0 errors, 0 warnings
+    Info: Peak virtual memory: 301 megabytes
+    Info: Processing ended: Sat Dec 06 17:52:12 2014
+    Info: Elapsed time: 00:00:02
     Info: Total CPU time (on all processors): 00:00:01
 
 

@@ -38,15 +38,15 @@ typedef enum _STATE
     READY_TO_LISTEN,
     LISTENING,
     FILTERING,
-	TRANSMITTING,
-    TRANSMIT_FPGAS,
-	RECEIVE_FPGAS,
-	TRANSMIT_PIC,
+	CALCULATE_MAX,
+	TRANSMIT_FPGA1,
+	TRANSMIT_FPGA2,
+	TRANSMIT_SLAVE_PIC,
     // processing states
     // PROCESSING_DATA,
     // SENDING_DATA_TO_FPGAS,
-     RECEIVED_DATA_FROM_ONE_FPGA,
-     RECEIVED_DATA_FROM_BOTH_FPGA,
+    RECEIVE_DATA_FROM_FPGA1,
+	CONFIRM_DATA_FROM_FPGA1,
      SENDING_DATA_PIC,
     // RECEIVED_DATA_FROM_PIC,
 
@@ -67,17 +67,15 @@ typedef enum _STATE
 #define AMY_FPGA            (0x0004) // SS = RD2
 #define SARAH_FGPA          (0x0008) // SS = RD3
 
-// Macros for ADC Configuration
-// #define CONFIG1             (ADC_MODULE_OFF | ADC_IDLE_CONTINUE | ADC_FORMAT_INT16 | ADC_CLK_MANUAL |ADC_AUTO_SAMPLING_ON |ADC_SAMP_OFF)       // ADC sample hold
-// #define CONFIG2             (ADC_SCAN_OFF | ADC_ALT_BUF_ON) 
-// #define CONFIG3              (ADC_CONV_CLK_SYSTEM) // Use PBCLK
-// #define CONFIGPORT          (ENABLE_AN0_ANA)    // AN0 in analog input pin mode in Analog mode
-// #define CONFIGSCAN          (32'b0 & 32'b1)     // Select AN0 for input scan, skip rest
+#define LISTEN_ENABLE				(PORTEbits.RE0)		// for pushbotton enable to listen, input
 
-//                             // use AN0 for input, use ground as neg ref for AN0
-// #define CHANNELCONFIG       (ADC_CH0_POS_SAMPLEA_AN0 | ADC_CH0_NEG_SAMPLEA_NVREF) 
-//#define TWOSEC              (0x?????) // TODO
-//)
+// Flags for FPGA1 Communication
+#define FPGA1_SS					(PORTEbits.RE5)		// (output) turn on slave select for FPGA1
+#define	FPGA1_RECEIVE_READY		(PORTEbits.RE7)		// (input) FPGA ready to receive input
+#define FPGA1_TRANSMIT_READY			(PORTEbits.RE1)		// (input) FPGA1 finished processing data
+#define	READY_TO_LISTEN_TO_FPGA1	(PORTEbits.RE4)		// (output) ready to communicate with FPGA1
+#define FPGA1_CONFIRMED_RESULT		(PORTEbits.RE2)		// (input) FPGA1 confirmed that correct input received
+
                                                 
 
 
@@ -347,7 +345,11 @@ int main (void)
 		unsigned int receivedBUFFER;
         unsigned char switches;
 		unsigned char switchBuffer;
-        unsigned char enable;
+        unsigned char enable, fpga1_flag, fpga1_confirm;
+		unsigned int sendjunk;
+		unsigned int fpga1_results;
+		unsigned int fpga2_results;
+	
    
         unsigned char audioData; // Connected to AN0
 		char str[80];
@@ -360,11 +362,11 @@ int main (void)
 		int currentAudio;
 		int maxIndex;
         
-
+		initUART();
         initspi2();
-        initspi3();
-        initspi4();
-        initUART();
+       // initspi3();
+        //initspi4();
+        
         initadc();
 		initTMR45();
 		initTMR2();
@@ -376,9 +378,12 @@ int main (void)
         TRISD = 0xFF00;
 
         // set RE[0] = 1 to input - for pushbutton enable
-        // set RE[3:1] = 0 to output - for slave select
-		// set RB[4] = 0 for output for counter
-        TRISE = 0x0001; 
+        // set RE[1] = fpga1_flag, input
+		// set RE[2] = fpga1_confirm, input
+		// set RE[4] = ready to listen, output
+		// set RE[5] = turn on slave select for FPGA1 state, output
+		// set RE[7] = fpga ready to receive, input
+        TRISE = 0b1000111; //0x0007; 
 
 		// set RB[7] = 1 for analog inputs
 		TRISB = 0xFFFF;
@@ -387,13 +392,15 @@ int main (void)
 
 
         printf("\n\nI am configured via UART correctly!\n");
-	
+		// default not ready to listen
+		
        while(1) {
-			PORTE = SARAH_FGPA;
-            enable = PORTE & 0x0001;   // pushbutton enable
+	
 
-			if (Master_State == DONE) {
+		/*	if (Master_State == DONE) {
+
 				printf("done\n");
+
 			/*	printf("print raw audio data \n");
 				for (i=0; i < rawAudioIndex;  i++) {
 						printf("%i, %i\n", i, rawAudio[i]);
@@ -402,124 +409,156 @@ int main (void)
 				printf("print windowed audio data \n");
 				for (i=0; i < 2000;  i++) {
 					printf("%i, %i\n", i, windowedAudio[i]);
-				} */
+				} 
 
 				printf("The final audio index is %i\n", rawAudioIndex);
 				printf("Final time is %i ms\n", ((TMR5 << 16 | TMR4)/78));	
 				printf("The sampling frequency of the ADC is %f Hz",  (rawAudioIndex/((TMR5 << 16 | TMR4)/78.0))*1000.0);
 				while(1);
-			}
+			} */
 
             switch(Master_State)
             {
                 case READY_TO_LISTEN:
                     // if pushbutton is pressed, then record audio
 					printf("Current state: Ready to Listen\n");
-                    if (enable == 1) {
+				
+					// clear FPGA1 flags
+					READY_TO_LISTEN_TO_FPGA1 = 0;
+					FPGA1_SS = 0; 
+
+                    if (LISTEN_ENABLE == 1) {
                         Master_State = LISTENING;
-                        printf("Current state: Ready to Listen\n");
                     }
                     break;
 
                 case LISTENING:
+				
                     printf("Current state: Listening\n");
 					startTMR45();	// sampling duration is 2 seconds
 					
-                	while ((TMR5 << 16 | TMR4) < 156250) {
+                	while ((TMR5 << 16 | TMR4) < 156250) {			
 						startTMR2(); // prepares the ADC sampling at 7khz
-
-						// in case anything goes wrong, break before write outside of array
-						if (rawAudioIndex == 14000){
-							printf("Final time is %i ms\n", ((TMR5 << 16 | TMR4)/78));	
-							Master_State = TRANSMITTING;
-							break;
-						}
-						
-						
 						while(TMR2 < 11); // wait for 11 TMR2 cycles ~ 7kHz sampling
-
 						rawAudio[rawAudioIndex++] = readadc();
 						stopTMR2();				
             	   }
-           			
+           	
                     stopTMR45();        
-                    Master_State = TRANSMITTING;
-
+                    Master_State = CALCULATE_MAX;
                     break;
 	
                 case FILTERING:
-
                     printf("Current state: Filtering\n");
                     break;
 
-                case TRANSMITTING:
-                    printf("Current state: TRANSMITTING\n");
+                case CALCULATE_MAX:
+                    printf("Current state: CALCULATE_MAX\n");
+					
 					
 					max = 0;
 					printf("Calculating max index...\n");
 					for (i = 0; i < 12000; i++) {
 						currentAudio = rawAudio[i];
-					//	printf("%i, %i\n", i, rawAudio[i]);
-						if (currentAudio > max) {
-						
+					
+						if (currentAudio > max) {				
 							max = currentAudio;
 							maxIndex = i;
 						}							
 					}
+
+					printf("Found max. maxIndex is %i\n", maxIndex);
+					Master_State = TRANSMIT_FPGA1;
+					break;
+
+				case TRANSMIT_FPGA1:
+					FPGA1_SS = 1; // turn on slave select
 					
-				
-					printf("maxIndex is %i\n", maxIndex);
-				
+					while(!FPGA1_RECEIVE_READY){
+						printf("pic state 1\n");
+					}
 					
-						if (maxIndex <= 500) {
-
-                            // sent over spi2
-							for (i = 0; i < 2000; i++){
-                               // printf("second loop %i, %i\n", i, rawAudio[i]);
-						  	   receivedSPI = spi_send_receive2(rawAudio[i]);
-							}
-
-                     /*       // sent over spi3
-                            for (i = 0; i < 2000; i++){
-                               // printf("second loop %i, %i\n", i, rawAudio[i]);
-                               receivedSPI = spi_send_receive3(rawAudio[i]);
-                            }
-
-                            // sent over spi4
-                            for (i = 0; i < 2000; i++){
-                               // printf("second loop %i, %i\n", i, rawAudio[i]);
-                               receivedSPI = spi_send_receive4(rawAudio[i]);
-                            }  */
-
-						} else {
-							
-                            // sent over spi2
-                            for (i = 0; i < 2000; i++){
-                               // printf("second loop %i, %i\n", i, rawAudio[i]);
-                               receivedSPI = spi_send_receive2(rawAudio[i]);
-                            }
-
-                       /*     // sent over spi3
-                            for (i = 0; i < 2000; i++){
-                               // printf("second loop %i, %i\n", i, rawAudio[i]);
-                               receivedSPI = spi_send_receive3(rawAudio[i]);
-                            }
-
-                            // sent over spi4
-                            for (i = 0; i < 2000; i++){
-                               // printf("second loop %i, %i\n", i, rawAudio[i]);
-                               receivedSPI = spi_send_receive4(rawAudio[i]);
-                            } */
-
-
+					printf("FPGA to be ready to receive\n");	
+					if (maxIndex <= 500) {
+						// sent over spi2
+						for (i = 0; i < 2000; i++){
+							printf("second loop %i, %i\n", i, rawAudio[i]);
+							receivedSPI = spi_send_receive2(rawAudio[i]);				
 						}
 
+					} else {
+						
+					   for (i = 0; i < 2000; i++){
+							printf("second loop %i, %i\n", i, rawAudio[maxIndex - 500 + i]);
+							receivedSPI = spi_send_receive2(rawAudio[maxIndex - 500 + i]);
+						}
+					}
+
+					printf("finished SPI transmission to FPGA1 \n");
+					FPGA1_SS = 0; //turn off slave select
+
+					Master_State = RECEIVE_DATA_FROM_FPGA1;
+
+                    break;
+
+                case RECEIVE_DATA_FROM_FPGA1:
+					printf("State: RECEIVE_DATA_FROM_FPGA1\n");		
+					
+					// check for fpga ready to transmit
+					while(!FPGA1_TRANSMIT_READY){
+						printf("pic state 3\n"); 
+					}
+					
+					// ******* PIC SHOULD BE IN STATE 3
+					printf("FPGAG1 input ready \n");
+
+					
+
+					FPGA1_SS = 1; // turn on slave select, PIC goes to state 4
+
+					
+					// ******* PIC SHOULD BE IN STATE 4
+					while(!FPGA1_RECEIVE_READY){
+						printf("pic state 4\n");
+					}
+				
+					fpga1_results = spi_send_receive2(sendjunk);
+
+					FPGA1_SS = 0; //turn off slave select
+					
+					printf("Received results from FPGA1 [%u], pic should be in state 5", fpga1_results);
+
 					Master_State = DONE;
-                    break;
+					break;
 
-                case PROCESSING_DATA:
-                    break;
+				//	FPGA1_SS = 0; //turn off slave select
 
+					Master_State = CONFIRM_DATA_FROM_FPGA1;
+
+					break;
+			
+				case CONFIRM_DATA_FROM_FPGA1:
+					
+					FPGA1_SS = 1; //turn off slave select, PIC state 5 -> state 6
+					while(!FPGA1_RECEIVE_READY){ 
+						printf("pic state 6\n");
+					}
+					
+					receivedSPI = spi_send_receive2(fpga1_results);
+
+					FPGA1_SS = 0;	// turn off slave select
+						
+					if (FPGA1_CONFIRMED_RESULT) {
+						printf("results from FPGA 1 are confirmed and are %u\n", fpga1_results);
+						Master_State = DONE;
+					} else {
+						printf("Confirmation was not correct [ %u ] ... receiving again.\n", fpga1_results);
+						Master_State = RECEIVE_DATA_FROM_FPGA1;
+					}
+
+                    break;
+				case SENDING_DATA_PIC:
+					break;
                 case COMPLETED_PROCESSING:
                     break;
 				case DONE:

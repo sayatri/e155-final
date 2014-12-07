@@ -30,7 +30,7 @@ file_000=no
 [OTHER_FILES]
 file_000=no
 [FILE_INFO]
-file_000=pic_master.c
+file_000=pic_master_adc_basic.c
 [SUITE_INFO]
 suite_guid={14495C23-81F8-43F3-8A44-859C583D7760}
 suite_state=

@@ -1,4 +1,4 @@
- -- Copyright (C) 1991-2013 Altera Corporation
+ -- Copyright (C) 1991-2012 Altera Corporation
  -- Your use of Altera Corporation's design tools, logic functions 
  -- and other software and tools, and its AMPP partner logic 
  -- functions, and any output files from any of the foregoing 
@@ -63,7 +63,7 @@
  -- Pin directions (input, output or bidir) are based on device operating in user mode.
  ---------------------------------------------------------------------------------
 
-Quartus II 64-Bit Version 13.0.0 Build 156 04/24/2013 SJ Web Edition
+Quartus II 32-bit Version 12.0 Build 178 05/31/2012 SJ Web Edition
 CHIP  "speechrec"  ASSIGNED TO AN: EP3C5E144C8
 
 Pin Name/Usage               : Location  : Dir.   : I/O Standard      : Voltage : I/O Bank  : User Assignment
@@ -141,24 +141,24 @@ RESERVED_INPUT_WITH_WEAK_PULLUP : 70        :        :                   :      
 RESERVED_INPUT_WITH_WEAK_PULLUP : 71        :        :                   :         : 4         :                
 RESERVED_INPUT_WITH_WEAK_PULLUP : 72        :        :                   :         : 4         :                
 RESERVED_INPUT_WITH_WEAK_PULLUP : 73        :        :                   :         : 5         :                
-ss                           : 74        : input  : 2.5 V             :         : 5         : Y              
-sdo                          : 75        : output : 2.5 V             :         : 5         : Y              
-sdi                          : 76        : input  : 2.5 V             :         : 5         : Y              
-RESERVED_INPUT_WITH_WEAK_PULLUP : 77        :        :                   :         : 5         :                
+RESERVED_INPUT_WITH_WEAK_PULLUP : 74        :        :                   :         : 5         :                
+sdi                          : 75        : input  : 2.5 V             :         : 5         : Y              
+sdo                          : 76        : output : 2.5 V             :         : 5         : Y              
+receive_ready                : 77        : output : 2.5 V             :         : 5         : Y              
 VCCINT                       : 78        : power  :                   : 1.2V    :           :                
 RESERVED_INPUT_WITH_WEAK_PULLUP : 79        :        :                   :         : 5         :                
 RESERVED_INPUT_WITH_WEAK_PULLUP : 80        :        :                   :         : 5         :                
 VCCIO5                       : 81        : power  :                   : 2.5V    : 5         :                
 GND                          : 82        : gnd    :                   :         :           :                
-RESERVED_INPUT_WITH_WEAK_PULLUP : 83        :        :                   :         : 5         :                
+ss                           : 83        : input  : 2.5 V             :         : 5         : Y              
 RESERVED_INPUT_WITH_WEAK_PULLUP : 84        :        :                   :         : 5         :                
-result[0]                    : 85        : output : 2.5 V             :         : 5         : N              
-RESERVED_INPUT_WITH_WEAK_PULLUP : 86        :        :                   :         : 5         :                
-RESERVED_INPUT_WITH_WEAK_PULLUP : 87        :        :                   :         : 5         :                
+RESERVED_INPUT_WITH_WEAK_PULLUP : 85        :        :                   :         : 5         :                
+data_confirmed               : 86        : output : 2.5 V             :         : 5         : Y              
+transmit_ready               : 87        : output : 2.5 V             :         : 5         : Y              
 clk                          : 88        : input  : 2.5 V             :         : 5         : Y              
 GND+                         : 89        :        :                   :         : 5         :                
-reset                        : 90        : input  : 2.5 V             :         : 6         : N              
-GND+                         : 91        :        :                   :         : 6         :                
+GND+                         : 90        :        :                   :         : 6         :                
+reset                        : 91        : input  : 2.5 V             :         : 6         : Y              
 CONF_DONE                    : 92        :        :                   :         : 6         :                
 VCCIO6                       : 93        : power  :                   : 2.5V    : 6         :                
 MSEL0                        : 94        :        :                   :         : 6         :                
@@ -195,7 +195,7 @@ RESERVED_INPUT_WITH_WEAK_PULLUP : 124       :        :                   :      
 RESERVED_INPUT_WITH_WEAK_PULLUP : 125       :        :                   :         : 7         :                
 RESERVED_INPUT_WITH_WEAK_PULLUP : 126       :        :                   :         : 7         :                
 RESERVED_INPUT_WITH_WEAK_PULLUP : 127       :        :                   :         : 7         :                
-result[3]                    : 128       : output : 2.5 V             :         : 8         : N              
+RESERVED_INPUT_WITH_WEAK_PULLUP : 128       :        :                   :         : 8         :                
 RESERVED_INPUT_WITH_WEAK_PULLUP : 129       :        :                   :         : 8         :                
 VCCIO8                       : 130       : power  :                   : 2.5V    : 8         :                
 GND                          : 131       : gnd    :                   :         :           :                
@@ -208,8 +208,8 @@ RESERVED_INPUT_WITH_WEAK_PULLUP : 137       :        :                   :      
 RESERVED_INPUT_WITH_WEAK_PULLUP : 138       :        :                   :         : 8         :                
 VCCIO8                       : 139       : power  :                   : 2.5V    : 8         :                
 GND                          : 140       : gnd    :                   :         :           :                
-result[2]                    : 141       : output : 2.5 V             :         : 8         : N              
+RESERVED_INPUT_WITH_WEAK_PULLUP : 141       :        :                   :         : 8         :                
 RESERVED_INPUT_WITH_WEAK_PULLUP : 142       :        :                   :         : 8         :                
-result[1]                    : 143       : output : 2.5 V             :         : 8         : N              
+RESERVED_INPUT_WITH_WEAK_PULLUP : 143       :        :                   :         : 8         :                
 RESERVED_INPUT_WITH_WEAK_PULLUP : 144       :        :                   :         : 8         :                
 GND                          : EPAD      :        :                   :         :           :                
