@@ -1,6 +1,6 @@
 EDA Netlist Writer report for peripherals
-Sun Dec 07 02:39:13 2014
-Quartus II 32-bit Version 13.0.0 Build 156 04/24/2013 SJ Web Edition
+Mon Dec 08 07:31:50 2014
+Quartus II 64-Bit Version 13.0.0 Build 156 04/24/2013 SJ Web Edition
 
 
 ---------------------
@@ -36,7 +36,7 @@ applicable agreement for further details.
 +-------------------------------------------------------------------+
 ; EDA Netlist Writer Summary                                        ;
 +---------------------------+---------------------------------------+
-; EDA Netlist Writer Status ; Successful - Sun Dec 07 02:39:13 2014 ;
+; EDA Netlist Writer Status ; Successful - Mon Dec 08 07:31:50 2014 ;
 ; Revision Name             ; peripherals                           ;
 ; Top-level Entity Name     ; peripherals                           ;
 ; Family                    ; Cyclone III                           ;
@@ -66,42 +66,42 @@ applicable agreement for further details.
 +---------------------------------------------------------------------------------------------------+---------------------------------+
 
 
-+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-; Simulation Generated Files                                                                                                                                               ;
-+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-; Generated Files                                                                                                                                                          ;
-+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-; //charlie.ac.hmc.edu/HMC_2016/strisorus/E155/Final Project/e155-final-master/e155-final-master/fpga_peripherals/simulation/modelsim/peripherals_8_1200mv_85c_slow.svo    ;
-; //charlie.ac.hmc.edu/HMC_2016/strisorus/E155/Final Project/e155-final-master/e155-final-master/fpga_peripherals/simulation/modelsim/peripherals_8_1200mv_0c_slow.svo     ;
-; //charlie.ac.hmc.edu/HMC_2016/strisorus/E155/Final Project/e155-final-master/e155-final-master/fpga_peripherals/simulation/modelsim/peripherals_min_1200mv_0c_fast.svo   ;
-; //charlie.ac.hmc.edu/HMC_2016/strisorus/E155/Final Project/e155-final-master/e155-final-master/fpga_peripherals/simulation/modelsim/peripherals.svo                      ;
-; //charlie.ac.hmc.edu/HMC_2016/strisorus/E155/Final Project/e155-final-master/e155-final-master/fpga_peripherals/simulation/modelsim/peripherals_8_1200mv_85c_v_slow.sdo  ;
-; //charlie.ac.hmc.edu/HMC_2016/strisorus/E155/Final Project/e155-final-master/e155-final-master/fpga_peripherals/simulation/modelsim/peripherals_8_1200mv_0c_v_slow.sdo   ;
-; //charlie.ac.hmc.edu/HMC_2016/strisorus/E155/Final Project/e155-final-master/e155-final-master/fpga_peripherals/simulation/modelsim/peripherals_min_1200mv_0c_v_fast.sdo ;
-; //charlie.ac.hmc.edu/HMC_2016/strisorus/E155/Final Project/e155-final-master/e155-final-master/fpga_peripherals/simulation/modelsim/peripherals_v.sdo                    ;
-+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
++--------------------------------------------------------------------------------------------------------------------------------------------+
+; Simulation Generated Files                                                                                                                 ;
++--------------------------------------------------------------------------------------------------------------------------------------------+
+; Generated Files                                                                                                                            ;
++--------------------------------------------------------------------------------------------------------------------------------------------+
+; C:/Users/strisorus/Downloads/e155-final-master/e155-final-master/fpga_peripherals/simulation/modelsim/peripherals_8_1200mv_85c_slow.svo    ;
+; C:/Users/strisorus/Downloads/e155-final-master/e155-final-master/fpga_peripherals/simulation/modelsim/peripherals_8_1200mv_0c_slow.svo     ;
+; C:/Users/strisorus/Downloads/e155-final-master/e155-final-master/fpga_peripherals/simulation/modelsim/peripherals_min_1200mv_0c_fast.svo   ;
+; C:/Users/strisorus/Downloads/e155-final-master/e155-final-master/fpga_peripherals/simulation/modelsim/peripherals.svo                      ;
+; C:/Users/strisorus/Downloads/e155-final-master/e155-final-master/fpga_peripherals/simulation/modelsim/peripherals_8_1200mv_85c_v_slow.sdo  ;
+; C:/Users/strisorus/Downloads/e155-final-master/e155-final-master/fpga_peripherals/simulation/modelsim/peripherals_8_1200mv_0c_v_slow.sdo   ;
+; C:/Users/strisorus/Downloads/e155-final-master/e155-final-master/fpga_peripherals/simulation/modelsim/peripherals_min_1200mv_0c_v_fast.sdo ;
+; C:/Users/strisorus/Downloads/e155-final-master/e155-final-master/fpga_peripherals/simulation/modelsim/peripherals_v.sdo                    ;
++--------------------------------------------------------------------------------------------------------------------------------------------+
 
 
 +-----------------------------+
 ; EDA Netlist Writer Messages ;
 +-----------------------------+
 Info: *******************************************************************
-Info: Running Quartus II 32-bit EDA Netlist Writer
+Info: Running Quartus II 64-Bit EDA Netlist Writer
     Info: Version 13.0.0 Build 156 04/24/2013 SJ Web Edition
-    Info: Processing started: Sun Dec 07 02:39:11 2014
+    Info: Processing started: Mon Dec 08 07:31:48 2014
 Info: Command: quartus_eda --read_settings_files=off --write_settings_files=off peripherals -c peripherals
-Info (204019): Generated file peripherals_8_1200mv_85c_slow.svo in folder "//charlie.ac.hmc.edu/HMC_2016/strisorus/E155/Final Project/e155-final-master/e155-final-master/fpga_peripherals/simulation/modelsim/" for EDA simulation tool
-Info (204019): Generated file peripherals_8_1200mv_0c_slow.svo in folder "//charlie.ac.hmc.edu/HMC_2016/strisorus/E155/Final Project/e155-final-master/e155-final-master/fpga_peripherals/simulation/modelsim/" for EDA simulation tool
-Info (204019): Generated file peripherals_min_1200mv_0c_fast.svo in folder "//charlie.ac.hmc.edu/HMC_2016/strisorus/E155/Final Project/e155-final-master/e155-final-master/fpga_peripherals/simulation/modelsim/" for EDA simulation tool
-Info (204019): Generated file peripherals.svo in folder "//charlie.ac.hmc.edu/HMC_2016/strisorus/E155/Final Project/e155-final-master/e155-final-master/fpga_peripherals/simulation/modelsim/" for EDA simulation tool
-Info (204019): Generated file peripherals_8_1200mv_85c_v_slow.sdo in folder "//charlie.ac.hmc.edu/HMC_2016/strisorus/E155/Final Project/e155-final-master/e155-final-master/fpga_peripherals/simulation/modelsim/" for EDA simulation tool
-Info (204019): Generated file peripherals_8_1200mv_0c_v_slow.sdo in folder "//charlie.ac.hmc.edu/HMC_2016/strisorus/E155/Final Project/e155-final-master/e155-final-master/fpga_peripherals/simulation/modelsim/" for EDA simulation tool
-Info (204019): Generated file peripherals_min_1200mv_0c_v_fast.sdo in folder "//charlie.ac.hmc.edu/HMC_2016/strisorus/E155/Final Project/e155-final-master/e155-final-master/fpga_peripherals/simulation/modelsim/" for EDA simulation tool
-Info (204019): Generated file peripherals_v.sdo in folder "//charlie.ac.hmc.edu/HMC_2016/strisorus/E155/Final Project/e155-final-master/e155-final-master/fpga_peripherals/simulation/modelsim/" for EDA simulation tool
-Info: Quartus II 32-bit EDA Netlist Writer was successful. 0 errors, 0 warnings
-    Info: Peak virtual memory: 342 megabytes
-    Info: Processing ended: Sun Dec 07 02:39:13 2014
+Info (204019): Generated file peripherals_8_1200mv_85c_slow.svo in folder "C:/Users/strisorus/Downloads/e155-final-master/e155-final-master/fpga_peripherals/simulation/modelsim/" for EDA simulation tool
+Info (204019): Generated file peripherals_8_1200mv_0c_slow.svo in folder "C:/Users/strisorus/Downloads/e155-final-master/e155-final-master/fpga_peripherals/simulation/modelsim/" for EDA simulation tool
+Info (204019): Generated file peripherals_min_1200mv_0c_fast.svo in folder "C:/Users/strisorus/Downloads/e155-final-master/e155-final-master/fpga_peripherals/simulation/modelsim/" for EDA simulation tool
+Info (204019): Generated file peripherals.svo in folder "C:/Users/strisorus/Downloads/e155-final-master/e155-final-master/fpga_peripherals/simulation/modelsim/" for EDA simulation tool
+Info (204019): Generated file peripherals_8_1200mv_85c_v_slow.sdo in folder "C:/Users/strisorus/Downloads/e155-final-master/e155-final-master/fpga_peripherals/simulation/modelsim/" for EDA simulation tool
+Info (204019): Generated file peripherals_8_1200mv_0c_v_slow.sdo in folder "C:/Users/strisorus/Downloads/e155-final-master/e155-final-master/fpga_peripherals/simulation/modelsim/" for EDA simulation tool
+Info (204019): Generated file peripherals_min_1200mv_0c_v_fast.sdo in folder "C:/Users/strisorus/Downloads/e155-final-master/e155-final-master/fpga_peripherals/simulation/modelsim/" for EDA simulation tool
+Info (204019): Generated file peripherals_v.sdo in folder "C:/Users/strisorus/Downloads/e155-final-master/e155-final-master/fpga_peripherals/simulation/modelsim/" for EDA simulation tool
+Info: Quartus II 64-Bit EDA Netlist Writer was successful. 0 errors, 0 warnings
+    Info: Peak virtual memory: 382 megabytes
+    Info: Processing ended: Mon Dec 08 07:31:50 2014
     Info: Elapsed time: 00:00:02
-    Info: Total CPU time (on all processors): 00:00:02
+    Info: Total CPU time (on all processors): 00:00:01
 
 

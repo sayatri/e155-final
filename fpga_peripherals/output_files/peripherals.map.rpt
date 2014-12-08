@@ -1,6 +1,6 @@
 Analysis & Synthesis report for peripherals
-Sun Dec 07 02:38:39 2014
-Quartus II 32-bit Version 13.0.0 Build 156 04/24/2013 SJ Web Edition
+Mon Dec 08 07:31:33 2014
+Quartus II 64-Bit Version 13.0.0 Build 156 04/24/2013 SJ Web Edition
 
 
 ---------------------
@@ -14,12 +14,11 @@ Quartus II 32-bit Version 13.0.0 Build 156 04/24/2013 SJ Web Edition
   6. Analysis & Synthesis Resource Usage Summary
   7. Analysis & Synthesis Resource Utilization by Entity
   8. Registers Removed During Synthesis
-  9. Removed Registers Triggering Further Register Optimizations
- 10. General Register Statistics
+  9. General Register Statistics
+ 10. Multiplexer Restructuring Statistics (Restructuring Performed)
  11. Port Connectivity Checks: "spi_send_receive:spi"
  12. Elapsed Time Per Partition
  13. Analysis & Synthesis Messages
- 14. Analysis & Synthesis Suppressed Messages
 
 
 
@@ -45,16 +44,16 @@ applicable agreement for further details.
 +---------------------------------------------------------------------------------+
 ; Analysis & Synthesis Summary                                                    ;
 +------------------------------------+--------------------------------------------+
-; Analysis & Synthesis Status        ; Successful - Sun Dec 07 02:38:38 2014      ;
-; Quartus II 32-bit Version          ; 13.0.0 Build 156 04/24/2013 SJ Web Edition ;
+; Analysis & Synthesis Status        ; Successful - Mon Dec 08 07:31:33 2014      ;
+; Quartus II 64-Bit Version          ; 13.0.0 Build 156 04/24/2013 SJ Web Edition ;
 ; Revision Name                      ; peripherals                                ;
 ; Top-level Entity Name              ; peripherals                                ;
 ; Family                             ; Cyclone III                                ;
-; Total logic elements               ; 30                                         ;
-;     Total combinational functions  ; 21                                         ;
-;     Dedicated logic registers      ; 20                                         ;
-; Total registers                    ; 20                                         ;
-; Total pins                         ; 28                                         ;
+; Total logic elements               ; 74                                         ;
+;     Total combinational functions  ; 73                                         ;
+;     Dedicated logic registers      ; 43                                         ;
+; Total registers                    ; 43                                         ;
+; Total pins                         ; 26                                         ;
 ; Total virtual pins                 ; 0                                          ;
 ; Total memory bits                  ; 0                                          ;
 ; Embedded Multiplier 9-bit elements ; 0                                          ;
@@ -166,13 +165,13 @@ applicable agreement for further details.
 +----------------------------+-------------+
 
 
-+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-; Analysis & Synthesis Source Files Read                                                                                                                                                                                                                                                                                     ;
-+--------------------------------------------------------------------------------------------------------------------------------+-----------------+------------------------------+--------------------------------------------------------------------------------------------------------------------------------+---------+
-; File Name with User-Entered Path                                                                                               ; Used in Netlist ; File Type                    ; File Name with Absolute Path                                                                                                   ; Library ;
-+--------------------------------------------------------------------------------------------------------------------------------+-----------------+------------------------------+--------------------------------------------------------------------------------------------------------------------------------+---------+
-; //charlie.ac.hmc.edu/HMC_2016/strisorus/E155/Final Project/e155-final-master/e155-final-master/fpga_peripherals/peripherals.sv ; yes             ; User SystemVerilog HDL File  ; //charlie.ac.hmc.edu/HMC_2016/strisorus/E155/Final Project/e155-final-master/e155-final-master/fpga_peripherals/peripherals.sv ;         ;
-+--------------------------------------------------------------------------------------------------------------------------------+-----------------+------------------------------+--------------------------------------------------------------------------------------------------------------------------------+---------+
++------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Analysis & Synthesis Source Files Read                                                                                                                                                         ;
++----------------------------------+-----------------+------------------------------+--------------------------------------------------------------------------------------------------+---------+
+; File Name with User-Entered Path ; Used in Netlist ; File Type                    ; File Name with Absolute Path                                                                     ; Library ;
++----------------------------------+-----------------+------------------------------+--------------------------------------------------------------------------------------------------+---------+
+; peripherals.sv                   ; yes             ; User SystemVerilog HDL File  ; C:/Users/strisorus/Downloads/e155-final-master/e155-final-master/fpga_peripherals/peripherals.sv ;         ;
++----------------------------------+-----------------+------------------------------+--------------------------------------------------------------------------------------------------+---------+
 
 
 +---------------------------------------------------------+
@@ -180,62 +179,51 @@ applicable agreement for further details.
 +---------------------------------------------+-----------+
 ; Resource                                    ; Usage     ;
 +---------------------------------------------+-----------+
-; Estimated Total logic elements              ; 30        ;
+; Estimated Total logic elements              ; 74        ;
 ;                                             ;           ;
-; Total combinational functions               ; 21        ;
+; Total combinational functions               ; 73        ;
 ; Logic element usage by number of LUT inputs ;           ;
-;     -- 4 input functions                    ; 13        ;
-;     -- 3 input functions                    ; 6         ;
-;     -- <=2 input functions                  ; 2         ;
+;     -- 4 input functions                    ; 25        ;
+;     -- 3 input functions                    ; 13        ;
+;     -- <=2 input functions                  ; 35        ;
 ;                                             ;           ;
 ; Logic elements by mode                      ;           ;
-;     -- normal mode                          ; 21        ;
-;     -- arithmetic mode                      ; 0         ;
+;     -- normal mode                          ; 51        ;
+;     -- arithmetic mode                      ; 22        ;
 ;                                             ;           ;
-; Total registers                             ; 20        ;
-;     -- Dedicated logic registers            ; 20        ;
+; Total registers                             ; 43        ;
+;     -- Dedicated logic registers            ; 43        ;
 ;     -- I/O registers                        ; 0         ;
 ;                                             ;           ;
-; I/O pins                                    ; 28        ;
+; I/O pins                                    ; 26        ;
 ; Embedded Multiplier 9-bit elements          ; 0         ;
-; Maximum fan-out node                        ; sck~input ;
-; Maximum fan-out                             ; 20        ;
-; Total fan-out                               ; 164       ;
-; Average fan-out                             ; 1.69      ;
+; Maximum fan-out node                        ; clk~input ;
+; Maximum fan-out                             ; 28        ;
+; Total fan-out                               ; 363       ;
+; Average fan-out                             ; 2.16      ;
 +---------------------------------------------+-----------+
 
 
-+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-; Analysis & Synthesis Resource Utilization by Entity                                                                                                                                       ;
-+----------------------------+-------------------+--------------+-------------+--------------+---------+-----------+------+--------------+-----------------------------------+--------------+
-; Compilation Hierarchy Node ; LC Combinationals ; LC Registers ; Memory Bits ; DSP Elements ; DSP 9x9 ; DSP 18x18 ; Pins ; Virtual Pins ; Full Hierarchy Name               ; Library Name ;
-+----------------------------+-------------------+--------------+-------------+--------------+---------+-----------+------+--------------+-----------------------------------+--------------+
-; |peripherals               ; 21 (8)            ; 20 (0)       ; 0           ; 0            ; 0       ; 0         ; 28   ; 0            ; |peripherals                      ;              ;
-;    |spi_send_receive:spi|  ; 13 (13)           ; 20 (20)      ; 0           ; 0            ; 0       ; 0         ; 0    ; 0            ; |peripherals|spi_send_receive:spi ;              ;
-+----------------------------+-------------------+--------------+-------------+--------------+---------+-----------+------+--------------+-----------------------------------+--------------+
++------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Analysis & Synthesis Resource Utilization by Entity                                                                                                                                                  ;
++---------------------------------+-------------------+--------------+-------------+--------------+---------+-----------+------+--------------+-----------------------------------------+--------------+
+; Compilation Hierarchy Node      ; LC Combinationals ; LC Registers ; Memory Bits ; DSP Elements ; DSP 9x9 ; DSP 18x18 ; Pins ; Virtual Pins ; Full Hierarchy Name                     ; Library Name ;
++---------------------------------+-------------------+--------------+-------------+--------------+---------+-----------+------+--------------+-----------------------------------------+--------------+
+; |peripherals                    ; 73 (15)           ; 43 (2)       ; 0           ; 0            ; 0       ; 0         ; 26   ; 0            ; |peripherals                            ;              ;
+;    |display_bargraph:displayer| ; 41 (41)           ; 26 (26)      ; 0           ; 0            ; 0       ; 0         ; 0    ; 0            ; |peripherals|display_bargraph:displayer ;              ;
+;    |spi_send_receive:spi|       ; 17 (17)           ; 15 (15)      ; 0           ; 0            ; 0       ; 0         ; 0    ; 0            ; |peripherals|spi_send_receive:spi       ;              ;
++---------------------------------+-------------------+--------------+-------------+--------------+---------+-----------+------+--------------+-----------------------------------------+--------------+
 Note: For table entries with two numbers listed, the numbers in parentheses indicate the number of resources of the given type used by the specific entity alone. The numbers listed outside of parentheses indicate the total resources of the given type used by the specific entity and all of its sub-entities in the hierarchy.
 
 
-+--------------------------------------------------------------------------------+
-; Registers Removed During Synthesis                                             ;
-+---------------------------------------+----------------------------------------+
-; Register name                         ; Reason for Removal                     ;
-+---------------------------------------+----------------------------------------+
-; state[0]                              ; Stuck at GND due to stuck port data_in ;
-; state[1]                              ; Stuck at VCC due to stuck port data_in ;
-; display_bargraph:displayer|cnt[0..2]  ; Lost fanout                            ;
-; Total Number of Removed Registers = 5 ;                                        ;
-+---------------------------------------+----------------------------------------+
-
-
-+------------------------------------------------------------------------------------+
-; Removed Registers Triggering Further Register Optimizations                        ;
-+---------------+---------------------------+----------------------------------------+
-; Register name ; Reason for Removal        ; Registers Removed due to This Register ;
-+---------------+---------------------------+----------------------------------------+
-; state[0]      ; Stuck at GND              ; state[1]                               ;
-;               ; due to stuck port data_in ;                                        ;
-+---------------+---------------------------+----------------------------------------+
++-------------------------------------------------------------+
+; Registers Removed During Synthesis                          ;
++----------------------------------------+--------------------+
+; Register name                          ; Reason for Removal ;
++----------------------------------------+--------------------+
+; display_bargraph:displayer|led_clk[23] ; Lost fanout        ;
+; Total Number of Removed Registers = 1  ;                    ;
++----------------------------------------+--------------------+
 
 
 +------------------------------------------------------+
@@ -243,23 +231,39 @@ Note: For table entries with two numbers listed, the numbers in parentheses indi
 +----------------------------------------------+-------+
 ; Statistic                                    ; Value ;
 +----------------------------------------------+-------+
-; Total registers                              ; 20    ;
-; Number of registers using Synchronous Clear  ; 0     ;
+; Total registers                              ; 43    ;
+; Number of registers using Synchronous Clear  ; 23    ;
 ; Number of registers using Synchronous Load   ; 0     ;
 ; Number of registers using Asynchronous Clear ; 0     ;
 ; Number of registers using Asynchronous Load  ; 0     ;
-; Number of registers using Clock Enable       ; 8     ;
+; Number of registers using Clock Enable       ; 3     ;
 ; Number of registers using Preset             ; 0     ;
 +----------------------------------------------+-------+
 
 
-+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-; Port Connectivity Checks: "spi_send_receive:spi"                                                                                                                                                            ;
-+-------+-------+----------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-; Port  ; Type  ; Severity ; Details                                                                                                                                                                          ;
-+-------+-------+----------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-; state ; Input ; Warning  ; Input port expression (2 bits) is wider than the input port (1 bits) it drives.  The 1 most-significant bit(s) in the expression will be dangling if they have no other fanouts. ;
-+-------+-------+----------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
++----------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Multiplexer Restructuring Statistics (Restructuring Performed)                                                                                                 ;
++--------------------+-----------+---------------+----------------------+------------------------+------------+--------------------------------------------------+
+; Multiplexer Inputs ; Bus Width ; Baseline Area ; Area if Restructured ; Saving if Restructured ; Registered ; Example Multiplexer Output                       ;
++--------------------+-----------+---------------+----------------------+------------------------+------------+--------------------------------------------------+
+; 3:1                ; 8 bits    ; 16 LEs        ; 8 LEs                ; 8 LEs                  ; Yes        ; |peripherals|spi_send_receive:spi|buffer[7]      ;
+; 3:1                ; 2 bits    ; 4 LEs         ; 4 LEs                ; 0 LEs                  ; Yes        ; |peripherals|state[1]                            ;
+; 3:1                ; 3 bits    ; 6 LEs         ; 3 LEs                ; 3 LEs                  ; Yes        ; |peripherals|spi_send_receive:spi|q[2]           ;
+; 3:1                ; 3 bits    ; 6 LEs         ; 3 LEs                ; 3 LEs                  ; Yes        ; |peripherals|display_bargraph:displayer|cnt[1]   ;
+; 3:1                ; 3 bits    ; 6 LEs         ; 3 LEs                ; 3 LEs                  ; No         ; |peripherals|sys_state                           ;
+; 9:1                ; 2 bits    ; 12 LEs        ; 10 LEs               ; 2 LEs                  ; No         ; |peripherals|display_bargraph:displayer|bar_R[0] ;
++--------------------+-----------+---------------+----------------------+------------------------+------------+--------------------------------------------------+
+
+
++-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Port Connectivity Checks: "spi_send_receive:spi"                                                                                                                                                                      ;
++----------------+--------+----------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Port           ; Type   ; Severity ; Details                                                                                                                                                                          ;
++----------------+--------+----------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; state          ; Input  ; Warning  ; Input port expression (2 bits) is wider than the input port (1 bits) it drives.  The 1 most-significant bit(s) in the expression will be dangling if they have no other fanouts. ;
+; q[7..3]        ; Output ; Info     ; Connected to dangling logic. Logic that only feeds a dangling port will be removed.                                                                                              ;
+; data_exchanged ; Output ; Info     ; Connected to dangling logic. Logic that only feeds a dangling port will be removed.                                                                                              ;
++----------------+--------+----------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
 
 +-------------------------------+
@@ -267,7 +271,7 @@ Note: For table entries with two numbers listed, the numbers in parentheses indi
 +----------------+--------------+
 ; Partition Name ; Elapsed Time ;
 +----------------+--------------+
-; Top            ; 00:00:01     ;
+; Top            ; 00:00:00     ;
 +----------------+--------------+
 
 
@@ -275,50 +279,37 @@ Note: For table entries with two numbers listed, the numbers in parentheses indi
 ; Analysis & Synthesis Messages ;
 +-------------------------------+
 Info: *******************************************************************
-Info: Running Quartus II 32-bit Analysis & Synthesis
+Info: Running Quartus II 64-Bit Analysis & Synthesis
     Info: Version 13.0.0 Build 156 04/24/2013 SJ Web Edition
-    Info: Processing started: Sun Dec 07 02:38:33 2014
+    Info: Processing started: Mon Dec 08 07:31:30 2014
 Info: Command: quartus_map --read_settings_files=on --write_settings_files=off peripherals -c peripherals
 Info (11104): Parallel Compilation has detected 4 hyper-threaded processors. However, the extra hyper-threaded processors will not be used by default. Parallel Compilation will use 2 of the 2 physical processors detected instead.
 Info (12021): Found 3 design units, including 3 entities, in source file peripherals.sv
     Info (12023): Found entity 1: peripherals
     Info (12023): Found entity 2: display_bargraph
     Info (12023): Found entity 3: spi_send_receive
+Info (12021): Found 2 design units, including 1 entities, in source file sfl.vhd
+    Info (12022): Found design unit 1: sfl-SYN
+    Info (12023): Found entity 1: sfl
+Warning (10236): Verilog HDL Implicit Net warning at peripherals.sv(81): created implicit net for "data_exchanged"
 Info (12127): Elaborating entity "peripherals" for the top level hierarchy
 Info (12128): Elaborating entity "spi_send_receive" for hierarchy "spi_send_receive:spi"
 Info (12128): Elaborating entity "display_bargraph" for hierarchy "display_bargraph:displayer"
 Warning (12241): 1 hierarchies have connectivity warnings - see the Connectivity Checks report folder
 Warning (13024): Output pins are stuck at VCC or GND
-    Warning (13410): Pin "led_rdy" is stuck at GND
-    Warning (13410): Pin "led_rec" is stuck at GND
-    Warning (13410): Pin "sys_state[0]" is stuck at GND
-    Warning (13410): Pin "sys_state[2]" is stuck at GND
-    Warning (13410): Pin "sys_state[4]" is stuck at GND
-    Warning (13410): Pin "sys_state[5]" is stuck at GND
-    Warning (13410): Pin "sys_state[6]" is stuck at GND
-    Warning (13410): Pin "sys_state[7]" is stuck at GND
+    Warning (13410): Pin "led[3]" is stuck at GND
 Info (286030): Timing-Driven Synthesis is running
-Info (17049): 3 registers lost all their fanouts during netlist optimizations.
-Info (144001): Generated suppressed messages file //charlie.ac.hmc.edu/HMC_2016/strisorus/E155/Final Project/e155-final-master/e155-final-master/fpga_peripherals/output_files/peripherals.map.smsg
+Info (17049): 1 registers lost all their fanouts during netlist optimizations.
 Info (16010): Generating hard_block partition "hard_block:auto_generated_inst"
     Info (16011): Adding 0 node(s), including 0 DDIO, 0 PLL, 0 transceiver and 0 LCELL
-Warning (21074): Design contains 2 input pin(s) that do not drive logic
-    Warning (15610): No output dependent on input pin "clk"
-    Warning (15610): No output dependent on input pin "ss"
-Info (21057): Implemented 58 device resources after synthesis - the final resource count might be different
-    Info (21058): Implemented 5 input pins
-    Info (21059): Implemented 23 output pins
-    Info (21061): Implemented 30 logic cells
-Info: Quartus II 32-bit Analysis & Synthesis was successful. 0 errors, 13 warnings
-    Info: Peak virtual memory: 364 megabytes
-    Info: Processing ended: Sun Dec 07 02:38:39 2014
-    Info: Elapsed time: 00:00:06
-    Info: Total CPU time (on all processors): 00:00:04
-
-
-+------------------------------------------+
-; Analysis & Synthesis Suppressed Messages ;
-+------------------------------------------+
-The suppressed messages can be found in //charlie.ac.hmc.edu/HMC_2016/strisorus/E155/Final Project/e155-final-master/e155-final-master/fpga_peripherals/output_files/peripherals.map.smsg.
+Info (21057): Implemented 101 device resources after synthesis - the final resource count might be different
+    Info (21058): Implemented 7 input pins
+    Info (21059): Implemented 19 output pins
+    Info (21061): Implemented 75 logic cells
+Info: Quartus II 64-Bit Analysis & Synthesis was successful. 0 errors, 4 warnings
+    Info: Peak virtual memory: 475 megabytes
+    Info: Processing ended: Mon Dec 08 07:31:33 2014
+    Info: Elapsed time: 00:00:03
+    Info: Total CPU time (on all processors): 00:00:02
 
 

@@ -1,8 +1,8 @@
 <sld_project_info>
   <project>
-    <hash md5_digest_80b="7dac9fa3fc5f89ca2502"/>
+    <hash md5_digest_80b="d145168b3fadb491dfba"/>
   </project>
   <file_info>
-    <file device="EP3C5E144C8" path="//charlie.ac.hmc.edu/HMC_2016/strisorus/E155/Final Project/e155-final-master/e155-final-master/fpga_peripherals/output_files/peripherals.sof" usercode="0xFFFFFFFF"/>
+    <file device="EP3C5E144C8" path="peripherals.sof" usercode="0xFFFFFFFF"/>
   </file_info>
 </sld_project_info>

@@ -32,28 +32,17 @@ This code:
 // *****************************************************************************
 // *****************************************************************************
 
-// Turns on the slave select for each slave
-#define SLAVE_PIC_ON        (0x0002) // SS = RD1
-#define AMY_FPGA            (0x0004) // SS = RD2
-#define SARAH_FGPA          (0x0008) // SS = RD3
+#define LISTEN_ENABLE           (PORTBbits.RB3)	 // for pushbotton enable to listen, input
+#define ENABLE_DOUBLE_REC       (PORTDbits.RD11) // enables error-checking double-recording mode
+#define PIC_READY_TO_TRANSMIT   (PORTEbits.RE4)  // flag indicating the slave PIC has data to send
+#define SYSTEM_RESET            (PORTEbits.RE5)
 
-#define LISTEN_ENABLE				(PORTBbits.RB3)		// for pushbotton enable to listen, input
-
-// Flags for FPGA1 Communication
-#define FPGA1_SS					(PORTEbits.RE5)		// (output) turn on slave select for FPGA1
-#define	FPGA1_RECEIVE_READY			(PORTEbits.RE7)		// (input) FPGA ready to receive input
-#define FPGA1_TRANSMIT_READY		(PORTEbits.RE1)		// (input) FPGA1 finished processing data
-#define	READY_TO_LISTEN_TO_FPGA1	(PORTEbits.RE4)		// (output) ready to communicate with FPGA1
-#define FPGA1_CONFIRMED_RESULT		(PORTEbits.RE2)		// (input) FPGA1 confirmed that correct input received
-//#define READY_TO_LISTEN				(0b0001)
-//#define LISTENING					(0b0010)
-//#define CALCULATE_MAX               (0b0011)
-//#define COMPLETED_PROCESSING        (0b1001)
-//#define DONE                        (0b1010)
-
-// todo change spi_send_receive3 to be 8 bits
-// reconfigure spi3
-
+// System state codes to send to FPGA
+#define CODE_READY_TO_LISTEN    (0b00000001)
+#define CODE_LISTENING          (0b00000010)
+#define CODE_PROCESSING         (0b00000011)
+#define CODE_DONE               (0b00000100)
+#define CODE_RESTART            (0b00000111)
 
 // *****************************************************************************
 // *****************************************************************************
@@ -68,18 +57,11 @@ typedef enum _STATE
     LISTENING,
     FILTERING,
 	CALCULATE_MAX,
-	TRANSMIT_FPGA1,
-	TRANSMIT_FPGA2,
 	TRANSMIT_SLAVE_PIC,
+    RECEIVE_RESULTS_SLAVE_PIC,
     // processing states
     // PROCESSING_DATA,
     // SENDING_DATA_TO_FPGAS,
-    RECEIVE_DATA_FROM_FPGA1,
-	CONFIRM_DATA_FROM_FPGA1,
-	RECEIVE_DATA_FROM_FPGA2,
-	CONFIRM_DATA_FROM_FPGA2,
-    SENDING_DATA_PIC,
-	RECEIVE_DATA_FROM_PIC,
     // RECEIVED_DATA_FROM_PIC,
 
     // completed processing
@@ -111,7 +93,7 @@ void initspi2(void) {
     IEC0CLR=0x03800000; // disable all interrupts
     SPI2CONbits.ON = 0; // disable SPI to reset any previous state
     junk = SPI2BUF; // read SPI buffer to clear the receive  SPI2SPIROV = 0; // clear the receive overflow flag
-    SPI2BRG = 7; //set BAUD rate to 1.25MHz, with Pclk at 20MHz 
+    SPI2BRG = 0; //set BAUD rate to 1.25MHz, with Pclk at 20MHz 
     SPI2CONbits.MSTEN = 1; // enable master mode
     SPI2CONbits.MSSEN = 1;
     SPI2CONbits.ENHBUF = 0;
@@ -145,14 +127,14 @@ void initspi3(void) {
     SPI3CONbits.SMP = 1; // input data sampled at end of data output time
     SPI3CONbits.CKE = 1; // set clock-to-data timing (data centered on rising SCK edge) 
     SPI3CONbits.ON = 1; // turn SPI on
-    SPI3CONbits.MODE32 = 1; // 8-bit datawidth
+    SPI3CONbits.MODE32 = 0; // 8-bit datawidth
     SPI3CONbits.MODE16 = 0; // 8-bit datawidth
 }
 
 
-unsigned int spi_send_receive3(signed int send) {
+char spi_send_receive3(char send) {
     SPI3BUF = send; // send data to slave
-    while (!SPI3STATbits.SPIBUSY); // wait until received buffer fills, indicating data received 
+    while (!SPI3STATbits.SPIRBF); // wait until received buffer fills, indicating data received 
     return SPI3BUF; // return received data and clear the read buffer full
 }
 
@@ -164,29 +146,29 @@ unsigned int spi_send_receive3(signed int send) {
 
 
 // for spi4 --------------------------------
-void initspi4(void) {
-    char junk;
+//void initspi4(void) {
+//    char junk;
+//
+//    IEC0CLR=0x03800000; // disable all interrupts
+//    SPI4CONbits.ON = 0; // disable SPI to reset any previous state
+//    junk = SPI4BUF; // read SPI buffer to clear the receive  SPI2SPIROV = 0; // clear the receive overflow flag
+//    SPI4BRG = 7; //set BAUD rate to 1.25MHz, with Pclk at 20MHz 
+//    SPI4CONbits.MSTEN = 1; // enable master mode
+//    SPI4CONbits.MSSEN = 1;
+//    SPI4CONbits.ENHBUF = 0;
+//    SPI4CONbits.SMP = 1; // input data sampled at end of data output time
+//    SPI4CONbits.CKE = 1; // set clock-to-data timing (data centered on rising SCK edge) 
+//    SPI4CONbits.ON = 1; // turn SPI on
+//    SPI4CONbits.MODE32 = 1; // 8-bit datawidth
+//    SPI4CONbits.MODE16 = 0; // 8-bit datawidth/
+//}
 
-    IEC0CLR=0x03800000; // disable all interrupts
-    SPI4CONbits.ON = 0; // disable SPI to reset any previous state
-    junk = SPI4BUF; // read SPI buffer to clear the receive  SPI2SPIROV = 0; // clear the receive overflow flag
-    SPI4BRG = 7; //set BAUD rate to 1.25MHz, with Pclk at 20MHz 
-    SPI4CONbits.MSTEN = 1; // enable master mode
-    SPI4CONbits.MSSEN = 1;
-    SPI4CONbits.ENHBUF = 0;
-    SPI4CONbits.SMP = 1; // input data sampled at end of data output time
-    SPI4CONbits.CKE = 1; // set clock-to-data timing (data centered on rising SCK edge) 
-    SPI4CONbits.ON = 1; // turn SPI on
-    SPI4CONbits.MODE32 = 1; // 8-bit datawidth
-    SPI4CONbits.MODE16 = 0; // 8-bit datawidth
-}
 
-
-unsigned int spi_send_receive4(signed int send) {
-    SPI4BUF = send; // send data to slave
-    while (!SPI4STATbits.SPIBUSY); // wait until received buffer fills, indicating data received 
-    return SPI4BUF; // return received data and clear the read buffer full
-}
+//unsigned int spi_send_receive4(signed int send) {
+//    SPI4BUF = send; // send data to slave
+//    while (!SPI4STATbits.SPIBUSY); // wait until received buffer fills, indicating data received 
+//    return SPI4BUF; // return received data and clear the read buffer full
+//}
 
 
 
@@ -355,25 +337,23 @@ int main (void)
         
 		unsigned int receivedSPI;
 		unsigned int receivedBUFFER;
-        unsigned char switches;
-		unsigned char switchBuffer;
-        unsigned char enable, fpga1_flag, fpga1_confirm;
 		unsigned int sendjunk;
-		unsigned int fpga1_results;
-		unsigned int fpga2_results;
-	
    
         unsigned char audioData; // Connected to AN0
 		char str[80];
+        char junk;
         unsigned int rawAudio [14000];
-		unsigned int windowedAudio [2000];
         short rawAudioIndex = 0;
 		short i = 0;
 		int max = 0;
-		int fakedata[4] = { 123456, 345678, 654452, 505053 };
+        unsigned int best_match = 0;
+
+        short recorded_twice = 0;
 	
 		int currentAudio;
-		int maxIndex;
+
+		int maxIndex1;
+        int maxIndex2;
         
 		initUART();
         initspi2();
@@ -384,258 +364,183 @@ int main (void)
 		initTMR45();
 		initTMR2();
 
-           
-        // set RD[7:0] to output, RD[11:8] to input
-        //   RD[7:0] are LEDs
-        //   RD[11:8] are switches
-        TRISD = 0xFF00;
+        TRISD = 0xFFF;
+        TRISE = 0b00111111; 
+		TRISB = 0xFFFC;     // 1111_1111_1111_1100
 
-        // set RE[0] = 1 to input - for pushbutton enable
-        // set RE[1] = fpga1_flag, input
-		// set RE[2] = fpga1_confirm, input
-		// set RE[4] = ready to listen, output
-		// set RE[5] = turn on slave select for FPGA1 state, output
-		// set RE[7] = fpga ready to receive, input
-        TRISE = 0b1000111; //0x0007; 
-
-		// set RB[3] enable
-		// set RB[2] = 1 for analog inputs
-		TRISB = 0b00001100;
-
-		
-
-
-        printf("\n\nI am configured via UART correctly!\n");
-		// default not ready to listen
 		
        while(1) {
-	
-
-			if (Master_State == DONE){
-
-
-					/*
-					if (maxIndex <= 500) {
-						for (i = 0; i < 2000; i++){
-							printf(" %i, %i\n", i, rawAudio[i]);			
-						}
-
-					} else {
-						
-					   for (i = 0; i < 2000; i++){
-							printf("%i, %i\n", (maxIndex - 500 + i), rawAudio[maxIndex - 500 + i]);
-						}
-					} */
-					
-					printf("Master_State = DONE\n");
-					break;
-
-			}
 			
             switch(Master_State)
             {
                 case READY_TO_LISTEN:
                     // if pushbutton is pressed, then record audio
-					printf("Current state: Ready to Listen\n");
+					printf("\nWaiting for audio input...\n");
 				
-					// clear FPGA1 flags
-					READY_TO_LISTEN_TO_FPGA1 = 0;
-					FPGA1_SS = 0; 
+                    while (!LISTEN_ENABLE && !SYSTEM_RESET) {
+                       // Send state to FPGA
+                       junk = spi_send_receive3(CODE_READY_TO_LISTEN);
+                    }
+					
+                    if (SYSTEM_RESET) {
+                        Master_State = READY_TO_LISTEN;
+                        recorded_twice = 0;
+                    }
+                    else {
+    					Master_State = LISTENING;
+					}
 
-                    while (!LISTEN_ENABLE);
-					
-					Master_State = LISTENING;
-					
                     break;
 
                 case LISTENING:
-				    printf("Current state: Listening\n");
+                    // Send state to FPGA
+                    junk = spi_send_receive3(CODE_LISTENING);
+
+				    printf("Recording...\n");
 					
+                    rawAudioIndex = 0;
 					startTMR45();	// sampling duration is 2 seconds
 					 while ((TMR5 << 16 | TMR4) < 156250) {	
 						startTMR2(); // prepares the ADC sampling at 7khz
 						while(TMR2 < 11); // wait for 11 TMR2 cycles ~ 7kHz sampling
+  
 						rawAudio[rawAudioIndex++] = readadc();
 						stopTMR2();				
-
-            	   }
+                	}
            	
-                    stopTMR45();     
+                    stopTMR45();   
 
-					
-				//	Master_State = READY_TO_LISTEN;
-                    Master_State = CALCULATE_MAX;
-                    break;
-	
-                case FILTERING:
-                    printf("Current state: Filtering\n");
+                    if (SYSTEM_RESET) {
+                        Master_State = READY_TO_LISTEN;
+                        recorded_twice = 0;
+                    }
+                    else {
+    					Master_State = CALCULATE_MAX;
+					}
+
                     break;
 
                 case CALCULATE_MAX:
-                    printf("Current state: CALCULATE_MAX\n");
+                    // Send state to FPGA
+                    junk = spi_send_receive3(CODE_PROCESSING);
 									
 					max = 0;
-					printf("Calculating max index...\n");
+
 					for (i = 0; i < 12000; i++) {
-						currentAudio = rawAudio[i];
-						if (currentAudio > max) {				
-							max = currentAudio;
-							maxIndex = i; 
-						}							
+                        if (SYSTEM_RESET) {
+                            recorded_twice = 0;
+                            break;
+                        }
+                        else {
+						    currentAudio = rawAudio[i];
+						    if (currentAudio > max) {				
+						    	max = currentAudio;
+							    maxIndex1 = i; 
+						    }
+                        }						
+					}
+                    
+                    if (SYSTEM_RESET) {
+                        recorded_twice = 0;
+                        Master_State = READY_TO_LISTEN;
+                    }
+                    else {
+    					Master_State = TRANSMIT_SLAVE_PIC;
 					}
 
-					printf("Found max. maxIndex is %i\n", maxIndex);
-					Master_State = TRANSMIT_SLAVE_PIC;
 					break;
-
-				case TRANSMIT_FPGA1:
-					FPGA1_SS = 1; // turn on slave select, PIC state 0 -> 1
-					
-					while(!FPGA1_RECEIVE_READY){
-						printf("waiting for fpga receive ready flag, pic state 1\n");
-					}
-					
-					printf("FPGA to be ready to receive\n");	
-					if (maxIndex <= 500) {
-						for (i = 0; i < 2000; i++){
-							printf("second loop %i, %i\n", i, rawAudio[i]);
-							receivedSPI = spi_send_receive2(rawAudio[i]);				
-						}
-
-					} else {
-						
-					   for (i = 0; i < 2000; i++){
-							printf("third loop %i, %i\n", maxIndex - 500 + i, rawAudio[maxIndex - 500 + i]);
-							receivedSPI = spi_send_receive2(rawAudio[maxIndex - 500 + i]);
-						}
-					}
-
-					printf("finished SPI transmission to FPGA1 \n");
-					FPGA1_SS = 0; //turn off slave select // turn off slave select PIC state 1 -> 3
-
-					Master_State = RECEIVE_DATA_FROM_FPGA1;
-
-                    break;
-
-                case RECEIVE_DATA_FROM_FPGA1:
-					printf("State: RECEIVE_DATA_FROM_FPGA1\n");		
-					
-					//************ PIC STATE 3 -> 4
-					// check for fpga ready to transmit
-					while(!FPGA1_TRANSMIT_READY) printf("pic state 3\n"); 
-			
-					printf("FPGAG1 input ready \n");
-
-					FPGA1_SS = 1; // turn on slave select, pic state 3->4
-
-					
-					// ******* PIC SHOULD BE IN STATE 4
-					while(!FPGA1_RECEIVE_READY)	printf("pic state 4\n");
-				
-					fpga1_results = spi_send_receive2(sendjunk);
-					
-		
-					FPGA1_SS = 0; //turn off slave select, pic state 4 -> 5
-					
-					printf("Received results from FPGA1 [%u], pic should be in state 5", fpga1_results);
-
-					//************ BREAKPOINT
-					Master_State = DONE;
-					break;
-					//************ BREAKPOINT
-
-					Master_State = CONFIRM_DATA_FROM_FPGA1;
-
-					break;
-			
-				case CONFIRM_DATA_FROM_FPGA1:
-					
-					FPGA1_SS = 1; //turn off slave select, PIC state 5 -> state 6
-					while(!FPGA1_RECEIVE_READY)	printf("pic state 6\n");
-					
-					receivedSPI = spi_send_receive2(fpga1_results);
-
-					FPGA1_SS = 0;	// turn off slave select
-						
-					if (FPGA1_CONFIRMED_RESULT) {
-						printf("results from FPGA 1 are confirmed and are %u\n", fpga1_results);
-						Master_State = DONE;
-					} else {
-						printf("Confirmation was not correct [ %u ] ... receiving again.\n", fpga1_results);
-						Master_State = RECEIVE_DATA_FROM_FPGA1;
-					}
-
-                    break;
-				case TRANSMIT_FPGA2:
-					break;
+               
 				case TRANSMIT_SLAVE_PIC:
+                    // Send state to FPGA
+                    junk = spi_send_receive3(CODE_PROCESSING);
+
+                    printf("Transmitting to PIC for processing...\n");
 						
-					if (maxIndex <= 500) {
+					if (maxIndex1 <= 500) {
 						for (i = 0; i < 2000; i++){
-							printf("second loop %i, %i\n", i, rawAudio[i]);
+                            if (SYSTEM_RESET) {
+                                break;
+                            }
+
 							receivedSPI = spi_send_receive2(rawAudio[i]);				
 						}
 
-					} else {
-						
+					}
+                    else {	
 					   for (i = 0; i < 2000; i++){
-							printf("third loop %i, %i\n", maxIndex - 500 + i, rawAudio[maxIndex - 500 + i]);
-							receivedSPI = spi_send_receive2(rawAudio[maxIndex - 500 + i]);
+                            if (SYSTEM_RESET) {
+                                break;
+                            }
+
+							receivedSPI = spi_send_receive2(rawAudio[maxIndex1 - 500 + i]);
 						}
 					}
-					printf("%i\n", maxIndex);
 
-					printf("finished SPI transmission to slave_pic \n");
+					printf("Finished transmission to slave PIC. \n");
 
-					Master_State = READY_TO_LISTEN;
-					break;
-				case RECEIVE_DATA_FROM_FPGA2:
-					
-				
-					break;
-				case CONFIRM_DATA_FROM_FPGA2:
-					break;
-				case SENDING_DATA_PIC:
-					
-					
-					for (i = 0; i < 4; i++){
-						receivedSPI = spi_send_receive2(fakedata[i]);
+                     if (SYSTEM_RESET) {
+                        Master_State = READY_TO_LISTEN;
+                        recorded_twice = 0;
+                    }
+                    else if (ENABLE_DOUBLE_REC & !recorded_twice) {
+                        printf("Double recording mode enabled.\n");
+                        Master_State = READY_TO_LISTEN;
+                        recorded_twice = 1;
+                    }
+                    else {
+    					Master_State = RECEIVE_RESULTS_SLAVE_PIC;
+                       //Master_State = READY_TO_LISTEN
 					}
-					
-					printf("finished sending data_pic\n");
-					Master_State = READY_TO_LISTEN;
+
 					break;
-                case COMPLETED_PROCESSING:
+                
+                case RECEIVE_RESULTS_SLAVE_PIC:
+                    printf("Waiting for results from PIC...\n");
+
+                    // Send state to FPGA
+                    junk = spi_send_receive3(CODE_PROCESSING);
+ 
+                    // Wait for the PIC to be ready
+                    while (!PIC_READY_TO_TRANSMIT && !SYSTEM_RESET);
+
+                    if (SYSTEM_RESET) {
+                        Master_State = READY_TO_LISTEN;
+                        recorded_twice = 0;
+                        break;
+                    }
+
+                    // Let FPGA know processing is done
+                    junk = spi_send_receive3(CODE_DONE);
+
+                    // Get the results from the PIC
+                    //best_match = spi_send_receive2(0xFFFF);
+
+                    //printf("PIC says %i was best.\n", best_match);
+
+                    if (SYSTEM_RESET) {
+                        Master_State = READY_TO_LISTEN;
+                        recorded_twice = 0;
+                    }
+                    else {
+    					Master_State = DONE;
+					}
                     break;
+                    
 				case DONE:
+                    printf("Finished!\n");
+
+                    if (SYSTEM_RESET) {
+                        Master_State = READY_TO_LISTEN;
+                        recorded_twice = 0;
+                        break;
+                    }
+
+                    // Send results to FPGA
+                    junk = spi_send_receive3((char)best_match);
+
+                    Master_State = READY_TO_LISTEN;
+                    recorded_twice = 0;
 					break;
-
             }
-             
         } 
-
 }
-
-
-// Successful SPI Code
-//-------------------------------------------------------------------------------
-   /*         
-
-            switchBuffer = (PORTD >> 8) & 0x000F;
-            if (switchBuffer != switches){
-                switches = switchBuffer;
-                PORTD = switches; // Read and mask RD[7:4]
-                                         // display on LED
-                printf("Switches are set to %d.\n", switches);
-            }
-            
-            receivedBUFFER = spi_send_receive2(switchBuffer);
-            //printf("Received this value from slave PIC: %d\n\n", receivedSPI);
-            if (receivedBUFFER != receivedSPI){
-                receivedSPI = receivedBUFFER;
-                PORTD = ((receivedSPI << 4 ) & 0x00F0 ) | switches;
-                printf("Received this value from slave PIC: %d\n\n", receivedSPI);
-            }
-
-    */
-//-------------------------------------------------------------------------------
