@@ -21,12 +21,15 @@
 
 unsigned short NUM_DATA = 2000;
 
+int offset[4] = {HELLO_OFFSET, BYE_OFFSET, YES_OFFSET, NO_OFFSET};
+int names[4] = {1, 2, 3, 4};
+
 unsigned short i = 0;
 unsigned int input_audio[2000];
 unsigned int fpga_results[4];
 
 unsigned int audio_delays[4];
-float dtw_results[2];
+
 
 unsigned short best_index[2] = {0,0};
 unsigned short best_value[2] = {0,0};
@@ -154,7 +157,7 @@ void initUART(void)
 
 float dtw(int *signal1, int *signal2, int signal1_start, int signal2_start, int length)
 {
-    int result = 0;
+    float result = 0;
     int x;
 
     for(x = 0; x < length; x++)
@@ -163,7 +166,7 @@ float dtw(int *signal1, int *signal2, int signal1_start, int signal2_start, int 
     }
 
     // Normalize the result to accomodate variable lengths
-    result = sqrt(result) / length;
+    result = sqrt(result) / (length * 1.0);
 
     return result;
 }
@@ -182,30 +185,32 @@ int main(void)
     initUART();
     initSPI();
 
-	int offset[4] = {HELLO_OFFSET, BYE_OFFSET, YES_OFFSET, NO_OFFSET};
-
-	char names[4][5] = {"hello", "bye", "yes", "no"};
+    //float dtw_results[4] = {0, 0, 0, 0};
 
 	printf("Slave PIC running with UART\n");
+
+while(1) { /*
     printf("Waiting for input audio data...\n");
 
     // Receive the entirety of the input audio file
     unsigned int temp;
     unsigned int junk = 0;
-	int j;
-	int k;
+	int i = 0;
+    int j = 0;
+	int k = 0;
  
     while (i < NUM_DATA) {
         temp = spi_send_receive(junk);
         input_audio[i] = temp;
+		printf("%u, %u\n", i, temp);
         ++i;
     }
 
-    //// Print out received data
-    //unsigned short j = 0;
-    //for ( ; j < NUM_DATA; j++) {
-    //    printf("%i, %i\n", j, audio[j]);
-    //}
+    // Print out received data
+    j = 0;
+    for ( ; j < NUM_DATA; j++) {
+        printf("%u, %u\n", j, input_audio[j]);
+    }
 
     /*printf("Waiting for results of FPGA...\n");
 
@@ -246,29 +251,35 @@ int main(void)
         }
     } */
 
-    printf("Performing DTW...\n");
+    /*printf("Performing DTW...\n");
 
 	j = 0;
 	k = 0;
 
 	int audiobankOffset;
-	int max_dtw = 0;
-	int best_match;
+	int min_dtw = 0xFFFF;
+	int best_match = 0;
 
+	printf("234234\n");
 	// processing dtw
 	for ( ; j < 4 ; j ++ ) {
 		
-		printf("Performing DTW for %s\n", names[j]);
-		audiobankOffset = offset[j];
-		dtw_results[j] = dtw(input_audio, HelloByeYesNo, 0, audiobankOffset, NUM_DATA);
+		//audiobankOffset = offset[j];
+		float temp = dtw(input_audio, HelloByeYesNo, 0, j*2000, NUM_DATA);
 		
-		if (dtw_results[j] > max_dtw) {
-			max_dtw = dtw_results[j] ;
+       printf("Result for %i: %f\n", names[j], temp);
+
+		if (temp < min_dtw) {
+			min_dtw = temp;
 			best_match = j;
 		}
 	}
 
-	printf("I think you said %s!\n", names[j]);
+	printf("best match is %i\n", best_match);
+	printf("min_dtw for %i: %f\n", min_dtw);
+/*	printf("I think you said %i!\n", names[best_match]); */
+
+}
 }
 
 	

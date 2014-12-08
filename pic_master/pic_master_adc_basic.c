@@ -28,6 +28,35 @@ This code:
 
 // *****************************************************************************
 // *****************************************************************************
+// Macros
+// *****************************************************************************
+// *****************************************************************************
+
+// Turns on the slave select for each slave
+#define SLAVE_PIC_ON        (0x0002) // SS = RD1
+#define AMY_FPGA            (0x0004) // SS = RD2
+#define SARAH_FGPA          (0x0008) // SS = RD3
+
+#define LISTEN_ENABLE				(PORTBbits.RB3)		// for pushbotton enable to listen, input
+
+// Flags for FPGA1 Communication
+#define FPGA1_SS					(PORTEbits.RE5)		// (output) turn on slave select for FPGA1
+#define	FPGA1_RECEIVE_READY			(PORTEbits.RE7)		// (input) FPGA ready to receive input
+#define FPGA1_TRANSMIT_READY		(PORTEbits.RE1)		// (input) FPGA1 finished processing data
+#define	READY_TO_LISTEN_TO_FPGA1	(PORTEbits.RE4)		// (output) ready to communicate with FPGA1
+#define FPGA1_CONFIRMED_RESULT		(PORTEbits.RE2)		// (input) FPGA1 confirmed that correct input received
+//#define READY_TO_LISTEN				(0b0001)
+//#define LISTENING					(0b0010)
+//#define CALCULATE_MAX               (0b0011)
+//#define COMPLETED_PROCESSING        (0b1001)
+//#define DONE                        (0b1010)
+
+// todo change spi_send_receive3 to be 8 bits
+// reconfigure spi3
+
+
+// *****************************************************************************
+// *****************************************************************************
 // Data Structures
 // *****************************************************************************
 // *****************************************************************************
@@ -50,35 +79,13 @@ typedef enum _STATE
 	RECEIVE_DATA_FROM_FPGA2,
 	CONFIRM_DATA_FROM_FPGA2,
     SENDING_DATA_PIC,
+	RECEIVE_DATA_FROM_PIC,
     // RECEIVED_DATA_FROM_PIC,
 
     // completed processing
     COMPLETED_PROCESSING,
 	DONE
-} STATE;
-
-
-// *****************************************************************************
-// *****************************************************************************
-// Macros
-// *****************************************************************************
-// *****************************************************************************
-
-// Turns on the slave select for each slave
-#define SLAVE_PIC_ON        (0x0002) // SS = RD1
-#define AMY_FPGA            (0x0004) // SS = RD2
-#define SARAH_FGPA          (0x0008) // SS = RD3
-
-#define LISTEN_ENABLE				(PORTEbits.RE0)		// for pushbotton enable to listen, input
-
-// Flags for FPGA1 Communication
-#define FPGA1_SS					(PORTEbits.RE5)		// (output) turn on slave select for FPGA1
-#define	FPGA1_RECEIVE_READY		(PORTEbits.RE7)		// (input) FPGA ready to receive input
-#define FPGA1_TRANSMIT_READY			(PORTEbits.RE1)		// (input) FPGA1 finished processing data
-#define	READY_TO_LISTEN_TO_FPGA1	(PORTEbits.RE4)		// (output) ready to communicate with FPGA1
-#define FPGA1_CONFIRMED_RESULT		(PORTEbits.RE2)		// (input) FPGA1 confirmed that correct input received
-
-                                                
+} STATE;                                                
 
 
 // *****************************************************************************
@@ -304,8 +311,11 @@ void initTMR45(void){
 }
 
 void startTMR45(void){
+	TMR4 = 0x0; // Stop any 16/32-bit Timer4 operation
+	TMR5= 0x0; // Stop any 16-bit Timer5 operation
     T4CONbits.ON = 1;
 	T5CONbits.ON = 1;
+	
 }
 
 void stopTMR45(void){
@@ -367,7 +377,7 @@ int main (void)
         
 		initUART();
         initspi2();
-       // initspi3();
+        initspi3();
         //initspi4();
         
         initadc();
@@ -388,8 +398,9 @@ int main (void)
 		// set RE[7] = fpga ready to receive, input
         TRISE = 0b1000111; //0x0007; 
 
-		// set RB[7] = 1 for analog inputs
-		TRISB = 0xFFFF;
+		// set RB[3] enable
+		// set RB[2] = 1 for analog inputs
+		TRISB = 0b00001100;
 
 		
 
@@ -403,7 +414,7 @@ int main (void)
 			if (Master_State == DONE){
 
 
-
+					/*
 					if (maxIndex <= 500) {
 						for (i = 0; i < 2000; i++){
 							printf(" %i, %i\n", i, rawAudio[i]);			
@@ -414,7 +425,8 @@ int main (void)
 					   for (i = 0; i < 2000; i++){
 							printf("%i, %i\n", (maxIndex - 500 + i), rawAudio[maxIndex - 500 + i]);
 						}
-					}
+					} */
+					
 					printf("Master_State = DONE\n");
 					break;
 
@@ -425,13 +437,12 @@ int main (void)
                 case READY_TO_LISTEN:
                     // if pushbutton is pressed, then record audio
 					printf("Current state: Ready to Listen\n");
-					printf("About to say Green\n");
 				
 					// clear FPGA1 flags
 					READY_TO_LISTEN_TO_FPGA1 = 0;
 					FPGA1_SS = 0; 
 
-                    while (!PORTEbits.RE0);
+                    while (!LISTEN_ENABLE);
 					
 					Master_State = LISTENING;
 					
@@ -442,7 +453,6 @@ int main (void)
 					
 					startTMR45();	// sampling duration is 2 seconds
 					 while ((TMR5 << 16 | TMR4) < 156250) {	
-		;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 						startTMR2(); // prepares the ADC sampling at 7khz
 						while(TMR2 < 11); // wait for 11 TMR2 cycles ~ 7kHz sampling
 						rawAudio[rawAudioIndex++] = readadc();
@@ -450,7 +460,10 @@ int main (void)
 
             	   }
            	
-                    stopTMR45();        
+                    stopTMR45();     
+
+					
+				//	Master_State = READY_TO_LISTEN;
                     Master_State = CALCULATE_MAX;
                     break;
 	
@@ -472,7 +485,7 @@ int main (void)
 					}
 
 					printf("Found max. maxIndex is %i\n", maxIndex);
-					Master_State = DONE;
+					Master_State = TRANSMIT_SLAVE_PIC;
 					break;
 
 				case TRANSMIT_FPGA1:
@@ -492,7 +505,7 @@ int main (void)
 					} else {
 						
 					   for (i = 0; i < 2000; i++){
-							printf("second loop %i, %i\n", i, rawAudio[maxIndex - 500 + i]);
+							printf("third loop %i, %i\n", maxIndex - 500 + i, rawAudio[maxIndex - 500 + i]);
 							receivedSPI = spi_send_receive2(rawAudio[maxIndex - 500 + i]);
 						}
 					}
@@ -566,16 +579,19 @@ int main (void)
 					} else {
 						
 					   for (i = 0; i < 2000; i++){
-							printf("second loop %i, %i\n", i, rawAudio[maxIndex - 500 + i]);
+							printf("third loop %i, %i\n", maxIndex - 500 + i, rawAudio[maxIndex - 500 + i]);
 							receivedSPI = spi_send_receive2(rawAudio[maxIndex - 500 + i]);
 						}
 					}
+					printf("%i\n", maxIndex);
 
 					printf("finished SPI transmission to slave_pic \n");
 
-					Master_State = SENDING_DATA_PIC;
+					Master_State = READY_TO_LISTEN;
 					break;
 				case RECEIVE_DATA_FROM_FPGA2:
+					
+				
 					break;
 				case CONFIRM_DATA_FROM_FPGA2:
 					break;
@@ -587,7 +603,7 @@ int main (void)
 					}
 					
 					printf("finished sending data_pic\n");
-					Master_State = DONE;
+					Master_State = READY_TO_LISTEN;
 					break;
                 case COMPLETED_PROCESSING:
                     break;
