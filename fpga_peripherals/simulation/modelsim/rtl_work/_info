@@ -1,0 +1,74 @@
+m255
+K3
+13
+cModel Technology
+Z0 dC:\Users\strisorus\Downloads\e155-final-master\e155-final-master\fpga_peripherals\simulation\modelsim
+vdisplay_bargraph
+Z1 DXx6 sv_std 3 std 0 22 F[19LRNL:5;XmIFh[XOPn1
+!i10b 1
+!s100 O7R2eOBA0XkVQL]n:L3Kd2
+Ii7d^GbYcY9hiH=j2gIGN:2
+VF_1ZU337Pf2PR>KnWQbbZ3
+Z2 !s105 peripherals_sv_unit
+S1
+Z3 dC:\Users\strisorus\Downloads\e155-final-master\e155-final-master\fpga_peripherals\simulation\modelsim
+Z4 w1418008202
+Z5 8C:/Users/strisorus/Downloads/e155-final-master/e155-final-master/fpga_peripherals/peripherals.sv
+Z6 FC:/Users/strisorus/Downloads/e155-final-master/e155-final-master/fpga_peripherals/peripherals.sv
+L0 86
+Z7 OV;L;10.1d;51
+r1
+!s85 0
+31
+Z8 !s108 1418008213.786000
+Z9 !s107 C:/Users/strisorus/Downloads/e155-final-master/e155-final-master/fpga_peripherals/peripherals.sv|
+Z10 !s90 -reportprogress|300|-sv|-work|work|+incdir+C:/Users/strisorus/Downloads/e155-final-master/e155-final-master/fpga_peripherals|-O0|C:/Users/strisorus/Downloads/e155-final-master/e155-final-master/fpga_peripherals/peripherals.sv|
+!s101 -O0
+Z11 o-sv -work work -O0
+Z12 !s92 -sv -work work +incdir+C:/Users/strisorus/Downloads/e155-final-master/e155-final-master/fpga_peripherals -O0
+vperipherals
+R1
+!i10b 1
+!s100 N6gGF8_dA_JzHM6<I0ZUD0
+I>2h@MD=o0B3]Wh:TAIbQ[3
+Vf1<1Bb;BH99igCoC7B4[f0
+R2
+S1
+R3
+R4
+R5
+R6
+L0 14
+R7
+r1
+!s85 0
+31
+R8
+R9
+R10
+!s101 -O0
+R11
+R12
+vspi_send_receive
+R1
+!i10b 1
+!s100 D38]LD37lK<c;fBN:a:o22
+IdlW4f]>9;W;ePi^n6if2f0
+VoFjSYh=9OGBb[2@280iR90
+R2
+S1
+R3
+R4
+R5
+R6
+L0 138
+R7
+r1
+!s85 0
+31
+R8
+R9
+R10
+!s101 -O0
+R11
+R12

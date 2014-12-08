@@ -1,0 +1,400 @@
+# Reading C:/altera/13.0/modelsim_ase/tcl/vsim/pref.tcl 
+# do peripherals_run_msim_rtl_verilog.do 
+# if {[file exists rtl_work]} {
+# 	vdel -lib rtl_work -all
+# }
+# vlib rtl_work
+# vmap work rtl_work
+# Copying C:\altera\13.0\modelsim_ase\win32aloem/../modelsim.ini to modelsim.ini
+# Modifying modelsim.ini
+# ** Warning: Copied C:\altera\13.0\modelsim_ase\win32aloem/../modelsim.ini to modelsim.ini.
+#          Updated modelsim.ini.
+# 
+# vlog -sv -work work +incdir+C:/Users/strisorus/Downloads/e155-final-master/e155-final-master/fpga_peripherals {C:/Users/strisorus/Downloads/e155-final-master/e155-final-master/fpga_peripherals/peripherals.sv}
+# Model Technology ModelSim ALTERA vlog 10.1d Compiler 2012.11 Nov  2 2012
+# -- Compiling module peripherals
+# -- Compiling module display_bargraph
+# -- Compiling module spi_send_receive
+# 
+# Top level modules:
+# 	peripherals
+# 
+vsim +altera -do peripherals_run_msim_rtl_verilog.do -l msim_transcript -gui work.peripherals
+# vsim +altera -do peripherals_run_msim_rtl_verilog.do -l msim_transcript -gui work.peripherals 
+# Loading sv_std.std
+# Loading work.peripherals
+# Loading work.spi_send_receive
+# Loading work.display_bargraph
+# ** Warning: (vsim-3015) C:/Users/strisorus/Downloads/e155-final-master/e155-final-master/fpga_peripherals/peripherals.sv(84): [PCDPC] - Port size (1 or 1) does not match connection size (2) for port 'state'. The port definition is at: C:/Users/strisorus/Downloads/e155-final-master/e155-final-master/fpga_peripherals/peripherals.sv(142).
+# 
+#         Region: /peripherals/spi
+# do peripherals_run_msim_rtl_verilog.do 
+# if {[file exists rtl_work]} {
+# 	vdel -lib rtl_work -all
+# }
+# vlib rtl_work
+# vmap work rtl_work
+# Modifying modelsim.ini
+# 
+# vlog -sv -work work +incdir+C:/Users/strisorus/Downloads/e155-final-master/e155-final-master/fpga_peripherals {C:/Users/strisorus/Downloads/e155-final-master/e155-final-master/fpga_peripherals/peripherals.sv}
+# Model Technology ModelSim ALTERA vlog 10.1d Compiler 2012.11 Nov  2 2012
+# -- Compiling module peripherals
+# -- Compiling module display_bargraph
+# -- Compiling module spi_send_receive
+# 
+# Top level modules:
+# 	peripherals
+# 
+add wave  \
+sim:/peripherals/sck \
+sim:/peripherals/sdi \
+sim:/peripherals/reset \
+sim:/peripherals/sdo \
+sim:/peripherals/bar_R \
+sim:/peripherals/bar_G \
+sim:/peripherals/led_rdy \
+sim:/peripherals/led_rec \
+sim:/peripherals/led_R \
+sim:/peripherals/led_G \
+sim:/peripherals/led_Y \
+sim:/peripherals/led_O \
+sim:/peripherals/data_receive \
+sim:/peripherals/sys_state \
+sim:/peripherals/listening \
+sim:/peripherals/processing \
+sim:/peripherals/done \
+sim:/peripherals/state \
+sim:/peripherals/nextstate
+add wave -position 6  sim:/peripherals/ready_to_listen
+force sck 1 100, 0 100
+force sdi 1 100, 0 100
+add wave -position 0  sim:/peripherals/clk
+force clk 1 50, 0 50
+run 500
+force data_receive 00000001
+run 500
+vlog -sv -work work +incdir+C:/Users/strisorus/Downloads/e155-final-master/e155-final-master/fpga_peripherals -O0 C:/Users/strisorus/Downloads/e155-final-master/e155-final-master/fpga_peripherals/peripherals.sv
+# Model Technology ModelSim ALTERA vlog 10.1d Compiler 2012.11 Nov  2 2012
+# -- Compiling module peripherals
+# -- Compiling module display_bargraph
+# -- Compiling module spi_send_receive
+# 
+# Top level modules:
+# 	peripherals
+restart -f
+# Loading sv_std.std
+# Loading work.peripherals
+# Loading work.spi_send_receive
+# Loading work.display_bargraph
+# ** Warning: (vsim-3015) C:/Users/strisorus/Downloads/e155-final-master/e155-final-master/fpga_peripherals/peripherals.sv(85): [PCDPC] - Port size (1 or 1) does not match connection size (2) for port 'state'. The port definition is at: C:/Users/strisorus/Downloads/e155-final-master/e155-final-master/fpga_peripherals/peripherals.sv(143).
+# 
+#         Region: /peripherals/spi
+force data_receive 00000001
+run 500
+vlog -sv -work work +incdir+C:/Users/strisorus/Downloads/e155-final-master/e155-final-master/fpga_peripherals -O0 C:/Users/strisorus/Downloads/e155-final-master/e155-final-master/fpga_peripherals/peripherals.sv
+# Model Technology ModelSim ALTERA vlog 10.1d Compiler 2012.11 Nov  2 2012
+# -- Compiling module peripherals
+# -- Compiling module display_bargraph
+# -- Compiling module spi_send_receive
+# 
+# Top level modules:
+# 	peripherals
+restart -f
+# Loading sv_std.std
+# Loading work.peripherals
+# Loading work.spi_send_receive
+# Loading work.display_bargraph
+# ** Warning: (vsim-3015) C:/Users/strisorus/Downloads/e155-final-master/e155-final-master/fpga_peripherals/peripherals.sv(85): [PCDPC] - Port size (1 or 1) does not match connection size (2) for port 'state'. The port definition is at: C:/Users/strisorus/Downloads/e155-final-master/e155-final-master/fpga_peripherals/peripherals.sv(143).
+# 
+#         Region: /peripherals/spi
+force data_receive 00000001
+run 500
+vlog -sv -work work +incdir+C:/Users/strisorus/Downloads/e155-final-master/e155-final-master/fpga_peripherals -O0 C:/Users/strisorus/Downloads/e155-final-master/e155-final-master/fpga_peripherals/peripherals.sv
+# Model Technology ModelSim ALTERA vlog 10.1d Compiler 2012.11 Nov  2 2012
+# -- Compiling module peripherals
+# -- Compiling module display_bargraph
+# -- Compiling module spi_send_receive
+# 
+# Top level modules:
+# 	peripherals
+restart -f
+# Loading sv_std.std
+# Loading work.peripherals
+# Loading work.spi_send_receive
+# Loading work.display_bargraph
+# ** Warning: (vsim-3015) C:/Users/strisorus/Downloads/e155-final-master/e155-final-master/fpga_peripherals/peripherals.sv(85): [PCDPC] - Port size (1 or 1) does not match connection size (2) for port 'state'. The port definition is at: C:/Users/strisorus/Downloads/e155-final-master/e155-final-master/fpga_peripherals/peripherals.sv(143).
+# 
+#         Region: /peripherals/spi
+force data_receive 00000001
+run 500
+force data_receive 00000010
+run 500
+force data_receive 00001111
+run 500
+vlog -sv -work work +incdir+C:/Users/strisorus/Downloads/e155-final-master/e155-final-master/fpga_peripherals -O0 C:/Users/strisorus/Downloads/e155-final-master/e155-final-master/fpga_peripherals/peripherals.sv
+# Model Technology ModelSim ALTERA vlog 10.1d Compiler 2012.11 Nov  2 2012
+# -- Compiling module peripherals
+# -- Compiling module display_bargraph
+# -- Compiling module spi_send_receive
+# 
+# Top level modules:
+# 	peripherals
+restart -f
+# Loading sv_std.std
+# Loading work.peripherals
+# Loading work.spi_send_receive
+# Loading work.display_bargraph
+# ** Warning: (vsim-3015) C:/Users/strisorus/Downloads/e155-final-master/e155-final-master/fpga_peripherals/peripherals.sv(85): [PCDPC] - Port size (1 or 1) does not match connection size (2) for port 'state'. The port definition is at: C:/Users/strisorus/Downloads/e155-final-master/e155-final-master/fpga_peripherals/peripherals.sv(143).
+# 
+#         Region: /peripherals/spi
+force data_receive 00001111
+run 500
+vlog -sv -work work +incdir+C:/Users/strisorus/Downloads/e155-final-master/e155-final-master/fpga_peripherals -O0 C:/Users/strisorus/Downloads/e155-final-master/e155-final-master/fpga_peripherals/peripherals.sv
+# Model Technology ModelSim ALTERA vlog 10.1d Compiler 2012.11 Nov  2 2012
+# -- Compiling module peripherals
+# -- Compiling module display_bargraph
+# -- Compiling module spi_send_receive
+# 
+# Top level modules:
+# 	peripherals
+restart -f
+# Loading sv_std.std
+# Loading work.peripherals
+# Loading work.spi_send_receive
+# Loading work.display_bargraph
+# ** Warning: (vsim-3015) C:/Users/strisorus/Downloads/e155-final-master/e155-final-master/fpga_peripherals/peripherals.sv(85): [PCDPC] - Port size (1 or 1) does not match connection size (2) for port 'state'. The port definition is at: C:/Users/strisorus/Downloads/e155-final-master/e155-final-master/fpga_peripherals/peripherals.sv(143).
+# 
+#         Region: /peripherals/spi
+vlog -sv -work work +incdir+C:/Users/strisorus/Downloads/e155-final-master/e155-final-master/fpga_peripherals -O0 C:/Users/strisorus/Downloads/e155-final-master/e155-final-master/fpga_peripherals/peripherals.sv
+# Model Technology ModelSim ALTERA vlog 10.1d Compiler 2012.11 Nov  2 2012
+# -- Compiling module peripherals
+# -- Compiling module display_bargraph
+# -- Compiling module spi_send_receive
+# 
+# Top level modules:
+# 	peripherals
+restart -f
+# Loading sv_std.std
+# Loading work.peripherals
+# Loading work.spi_send_receive
+# Loading work.display_bargraph
+# ** Warning: (vsim-3015) C:/Users/strisorus/Downloads/e155-final-master/e155-final-master/fpga_peripherals/peripherals.sv(85): [PCDPC] - Port size (1 or 1) does not match connection size (2) for port 'state'. The port definition is at: C:/Users/strisorus/Downloads/e155-final-master/e155-final-master/fpga_peripherals/peripherals.sv(143).
+# 
+#         Region: /peripherals/spi
+force data_receive 00001111
+run 500
+vlog -sv -work work +incdir+C:/Users/strisorus/Downloads/e155-final-master/e155-final-master/fpga_peripherals -O0 C:/Users/strisorus/Downloads/e155-final-master/e155-final-master/fpga_peripherals/peripherals.sv
+# Model Technology ModelSim ALTERA vlog 10.1d Compiler 2012.11 Nov  2 2012
+# -- Compiling module peripherals
+# -- Compiling module display_bargraph
+# -- Compiling module spi_send_receive
+# 
+# Top level modules:
+# 	peripherals
+restart -f
+# Loading sv_std.std
+# Loading work.peripherals
+# Loading work.spi_send_receive
+# Loading work.display_bargraph
+# ** Warning: (vsim-3015) C:/Users/strisorus/Downloads/e155-final-master/e155-final-master/fpga_peripherals/peripherals.sv(81): [PCDPC] - Port size (1 or 1) does not match connection size (2) for port 'state'. The port definition is at: C:/Users/strisorus/Downloads/e155-final-master/e155-final-master/fpga_peripherals/peripherals.sv(139).
+# 
+#         Region: /peripherals/spi
+force data_receive 00001111
+run 500
+force data_receive 00000010
+run 500
+vlog -sv -work work +incdir+C:/Users/strisorus/Downloads/e155-final-master/e155-final-master/fpga_peripherals -O0 C:/Users/strisorus/Downloads/e155-final-master/e155-final-master/fpga_peripherals/peripherals.sv
+# Model Technology ModelSim ALTERA vlog 10.1d Compiler 2012.11 Nov  2 2012
+# -- Compiling module peripherals
+# -- Compiling module display_bargraph
+# -- Compiling module spi_send_receive
+# ** Error: C:/Users/strisorus/Downloads/e155-final-master/e155-final-master/fpga_peripherals/peripherals.sv(173): near "always_ff": syntax error, unexpected always_ff
+# ** Error: C:/Users/strisorus/Downloads/e155-final-master/e155-final-master/fpga_peripherals/peripherals.sv(177): near "endmodule": syntax error, unexpected endmodule
+# C:/altera/13.0/modelsim_ase/win32aloem/vlog failed.
+vlog -sv -work work +incdir+C:/Users/strisorus/Downloads/e155-final-master/e155-final-master/fpga_peripherals -O0 C:/Users/strisorus/Downloads/e155-final-master/e155-final-master/fpga_peripherals/peripherals.sv
+# Model Technology ModelSim ALTERA vlog 10.1d Compiler 2012.11 Nov  2 2012
+# -- Compiling module peripherals
+# -- Compiling module display_bargraph
+# -- Compiling module spi_send_receive
+# 
+# Top level modules:
+# 	peripherals
+restart -f
+# Loading sv_std.std
+# Loading work.peripherals
+# Loading work.spi_send_receive
+# Loading work.display_bargraph
+# ** Warning: (vsim-3015) C:/Users/strisorus/Downloads/e155-final-master/e155-final-master/fpga_peripherals/peripherals.sv(81): [PCDPC] - Port size (1 or 1) does not match connection size (2) for port 'state'. The port definition is at: C:/Users/strisorus/Downloads/e155-final-master/e155-final-master/fpga_peripherals/peripherals.sv(139).
+# 
+#         Region: /peripherals/spi
+force data_receive 00000010
+run 500
+force sck 1 100, force sck 0 100
+# Invalid binary digit: f.
+# ** Error: (vsim-4011) Invalid force value: 1 100, force sck 0 100.
+# 
+force sck 1, 100 0, 100
+run 100
+run 400
+force sck 1 100, 0 100
+run 300
+force sck 1 00, 0 100 -repeta
+# Unknown option: repeta
+# ** Error: (vish-4003) Invalid option '-repeta'.
+# Usage: force [-freeze | -drive | -deposit] [-cancel <time>] [-repeat <time>] <object_name> {<value> [[@]<time>[<unit>]]}...
+force sck 1 00, 0 100 -repeat
+# Invalid time value: -repeat
+# ** Error: (vish-4004) The -repeat option requires a time period argument.
+# Usage: force [-freeze | -drive | -deposit] [-cancel <time>] [-repeat <time>] <object_name> {<value> [[@]<time>[<unit>]]}...
+force sck 1 00, 0 100 -repeat 0
+# ** Error: (vsim-3463) Period of -repeat must be greater than or equal to 1ps.
+# 
+run 300
+force -freeze sim:/peripherals/clk 1 0, 0 {50 ps} -r 100
+run 400
+force data_receive 00000000
+run 400
+vlog -sv -work work +incdir+C:/Users/strisorus/Downloads/e155-final-master/e155-final-master/fpga_peripherals -O0 C:/Users/strisorus/Downloads/e155-final-master/e155-final-master/fpga_peripherals/peripherals.sv
+# Model Technology ModelSim ALTERA vlog 10.1d Compiler 2012.11 Nov  2 2012
+# -- Compiling module peripherals
+# -- Compiling module display_bargraph
+# -- Compiling module spi_send_receive
+# 
+# Top level modules:
+# 	peripherals
+restart -f
+# Loading sv_std.std
+# Loading work.peripherals
+# Loading work.spi_send_receive
+# Loading work.display_bargraph
+# ** Warning: (vsim-3015) C:/Users/strisorus/Downloads/e155-final-master/e155-final-master/fpga_peripherals/peripherals.sv(81): [PCDPC] - Port size (1 or 1) does not match connection size (2) for port 'state'. The port definition is at: C:/Users/strisorus/Downloads/e155-final-master/e155-final-master/fpga_peripherals/peripherals.sv(138).
+# 
+#         Region: /peripherals/spi
+force -freeze sim:/peripherals/clk 1 0, 0 {50 ps} -r 100
+force data_receive 00000000
+run 200
+run 200
+force data_receive 00000001
+run 400
+force data_receive 00000010
+run 400
+force reset 1
+run 400
+force reset 0 run 400
+# Invalid time value: run 400
+force reset 0
+run 400
+force data_receive 00000011
+run 400
+run 800
+force data_receive 00000100
+run 400
+force data_exchanged 1
+run 400
+restart -f
+# Loading sv_std.std
+# Loading work.peripherals
+# Loading work.spi_send_receive
+# Loading work.display_bargraph
+# ** Warning: (vsim-3015) C:/Users/strisorus/Downloads/e155-final-master/e155-final-master/fpga_peripherals/peripherals.sv(81): [PCDPC] - Port size (1 or 1) does not match connection size (2) for port 'state'. The port definition is at: C:/Users/strisorus/Downloads/e155-final-master/e155-final-master/fpga_peripherals/peripherals.sv(138).
+# 
+#         Region: /peripherals/spi
+force clk 0 50, 1 100 -repeat 100
+run100
+# invalid command name "run100"
+run 200
+force sck 0 100, 1 200 -repeat 200
+run 400
+run 400
+force clk 0 25, 1 50 -repeat 100
+run 200
+run 200
+force clk 0 25, 1 50 -repeat 50
+run 100
+run 400
+force sck 0 50, 1 100 -repeat 100
+run 600
+force sdi 0 200, 1 200 -repeat 200
+run 500
+run 500
+run 1000
+add wave -position end  sim:/peripherals/spi/cnt
+add wave -position end  sim:/peripherals/spi/buffer
+run 500
+restart -f
+# Loading sv_std.std
+# Loading work.peripherals
+# Loading work.spi_send_receive
+# Loading work.display_bargraph
+# ** Warning: (vsim-3015) C:/Users/strisorus/Downloads/e155-final-master/e155-final-master/fpga_peripherals/peripherals.sv(81): [PCDPC] - Port size (1 or 1) does not match connection size (2) for port 'state'. The port definition is at: C:/Users/strisorus/Downloads/e155-final-master/e155-final-master/fpga_peripherals/peripherals.sv(138).
+# 
+#         Region: /peripherals/spi
+force clk 0 25, 1 50 -repeat 50
+force sck 0 50, 1 100 -repeat 100
+force sdi 0 300, 1 400 -repeat 400
+force reset 1
+run 50
+force reset 0
+run 100
+run 1000
+vlog -sv -work work +incdir+C:/Users/strisorus/Downloads/e155-final-master/e155-final-master/fpga_peripherals -O0 C:/Users/strisorus/Downloads/e155-final-master/e155-final-master/fpga_peripherals/peripherals.sv
+# Model Technology ModelSim ALTERA vlog 10.1d Compiler 2012.11 Nov  2 2012
+# -- Compiling module peripherals
+# -- Compiling module display_bargraph
+# -- Compiling module spi_send_receive
+# 
+# Top level modules:
+# 	peripherals
+restart -f
+# Loading sv_std.std
+# Loading work.peripherals
+# Loading work.spi_send_receive
+# Loading work.display_bargraph
+# ** Warning: (vsim-3015) C:/Users/strisorus/Downloads/e155-final-master/e155-final-master/fpga_peripherals/peripherals.sv(81): [PCDPC] - Port size (1 or 1) does not match connection size (2) for port 'state'. The port definition is at: C:/Users/strisorus/Downloads/e155-final-master/e155-final-master/fpga_peripherals/peripherals.sv(138).
+# 
+#         Region: /peripherals/spi
+force clk 0 25, 1 50 -repeat 50
+force sck 0 50, 1 100 -repeat 100
+force sdi 0 300, 1 400 -repeat 400
+force reset 1
+run 50
+run 1000
+restart -f
+# Loading sv_std.std
+# Loading work.peripherals
+# Loading work.spi_send_receive
+# Loading work.display_bargraph
+# ** Warning: (vsim-3015) C:/Users/strisorus/Downloads/e155-final-master/e155-final-master/fpga_peripherals/peripherals.sv(81): [PCDPC] - Port size (1 or 1) does not match connection size (2) for port 'state'. The port definition is at: C:/Users/strisorus/Downloads/e155-final-master/e155-final-master/fpga_peripherals/peripherals.sv(138).
+# 
+#         Region: /peripherals/spi
+force clk 0 25, 1 50 -repeat 50
+force sck 0 50, 1 100 -repeat 100
+force sdi 0 300, 1 400 -repeat 400
+force reset 1
+run 50
+force reset 0
+run 1000
+restart -f
+# Loading sv_std.std
+# Loading work.peripherals
+# Loading work.spi_send_receive
+# Loading work.display_bargraph
+# ** Warning: (vsim-3015) C:/Users/strisorus/Downloads/e155-final-master/e155-final-master/fpga_peripherals/peripherals.sv(81): [PCDPC] - Port size (1 or 1) does not match connection size (2) for port 'state'. The port definition is at: C:/Users/strisorus/Downloads/e155-final-master/e155-final-master/fpga_peripherals/peripherals.sv(138).
+# 
+#         Region: /peripherals/spi
+force clk 0 25, 1 50 -repeat 50
+force sck 0 50, 1 100 -repeat 100
+force sdi 0 300, 1 400 -repeat 400
+force reset 1
+run 100
+run 300
+force reset 0
+run 1000
+force sck 0
+run 400
+force sck 0 500
+run 500
+force sck 0 100 repeat -100
+# Invalid time value: 100 repeat
+force sck 0 100 -repeat 100
+run 500

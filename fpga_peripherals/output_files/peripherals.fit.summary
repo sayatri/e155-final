@@ -1,15 +1,15 @@
-Fitter Status : Successful - Sun Dec 07 02:38:54 2014
-Quartus II 32-bit Version : 13.0.0 Build 156 04/24/2013 SJ Web Edition
+Fitter Status : Successful - Mon Dec 08 07:31:41 2014
+Quartus II 64-Bit Version : 13.0.0 Build 156 04/24/2013 SJ Web Edition
 Revision Name : peripherals
 Top-level Entity Name : peripherals
 Family : Cyclone III
 Device : EP3C5E144C8
 Timing Models : Final
-Total logic elements : 26 / 5,136 ( < 1 % )
-    Total combinational functions : 21 / 5,136 ( < 1 % )
-    Dedicated logic registers : 20 / 5,136 ( < 1 % )
-Total registers : 20
-Total pins : 28 / 95 ( 29 % )
+Total logic elements : 73 / 5,136 ( 1 % )
+    Total combinational functions : 73 / 5,136 ( 1 % )
+    Dedicated logic registers : 43 / 5,136 ( < 1 % )
+Total registers : 43
+Total pins : 26 / 95 ( 27 % )
 Total virtual pins : 0
 Total memory bits : 0 / 423,936 ( 0 % )
 Embedded Multiplier 9-bit elements : 0 / 46 ( 0 % )
