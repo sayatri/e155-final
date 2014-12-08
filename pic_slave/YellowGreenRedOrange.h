@@ -1,4 +1,4 @@
-const char* recYellow[] = {
+static int YellowGreenRedOrange[] = {
 423	,
 420	,
 403	,
@@ -1999,8 +1999,6 @@ const char* recYellow[] = {
 370	,
 389	,
 391	,
-
-
 417	,
 408	,
 404	,
@@ -8001,6 +7999,6 @@ const char* recYellow[] = {
 387	,
 401	,
 408	
-}
+};
 
 

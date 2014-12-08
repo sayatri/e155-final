@@ -4,28 +4,30 @@
 #include <stdio.h>
 #include <p32xxxx.h>
 #include <math.h>
-#include "HelloByeYesNo.h"
+#include <string.h>
+#include "YellowGreenRedOrange.h"
 
+// *****************************************************************************
+// *****************************************************************************
+// Data Structures
+// *****************************************************************************
+// *****************************************************************************
 
-/*********
- DEFINES
-*********/
-#define	HELLO_OFFSET		(0)
-#define	BYE_OFFSET			(2000)
-#define YES_OFFSET			(4000)
-#define	NO_OFFSET			(6000)	
+// Describe the state of the PIC SLAVE
+typedef enum _STATE
+{
+	WAITING_FOR_INPUT,
+	PROCESS_DATA,
+	DONE_PROCESSING,
+	RESET_PRESSED
+} STATE;
+
 
 /*********
  GLOBALS
 **********/
 
-unsigned short NUM_DATA = 2000;
 
-int offset[4] = {HELLO_OFFSET, BYE_OFFSET, YES_OFFSET, NO_OFFSET};
-int names[4] = {1, 2, 3, 4};
-
-unsigned short i = 0;
-unsigned int input_audio[2000];
 unsigned int fpga_results[4];
 
 unsigned int audio_delays[4];
@@ -34,7 +36,13 @@ unsigned int audio_delays[4];
 unsigned short best_index[2] = {0,0};
 unsigned short best_value[2] = {0,0};
 
+STATE Slave_State = WAITING_FOR_INPUT;
 
+#define	DATA_READY	 		(PORTEbits.RE1)
+#define SYSTEM_RESET 		(PORTEbits.RE0)
+#define DOUBLE_INPUT 		(PORTEbits.RE2)
+#define CORRELATION_ON 		(PORTDbits.RD11)
+#define DEBUGGING_ON		(PORTDbits.RD10)
 
 /***********
  PWM
@@ -76,7 +84,7 @@ void initSPI(void) {
     IEC0CLR=0x03800000; // disable all interrupts
     SPI2CONbits.ON = 0; // disable SPI to reset any previous state
     junk = SPI2BUF; // read SPI buffer to clear the receive  SPI2SPIROV = 0; // clear the receive overflow flag
-    SPI2BRG = 7; //set BAUD rate to 1.25MHz, with Pclk at 20MHz 
+    SPI2BRG = 0; //set BAUD rate to 1.25MHz, with Pclk at 20MHz 
 	SPI2CONbits.ENHBUF = 0;
     SPI2CONbits.MSTEN = 0; // enable master mode
     SPI2CONbits.SSEN = 1;   // enable SS pin for slave mode
@@ -90,7 +98,10 @@ void initSPI(void) {
 
 unsigned int spi_send_receive(unsigned int send) {
     SPI2BUF = send; // send data to slave
-    while (!SPI2STATbits.SPIRBF); // wait until received buffer fills, indicating data received 
+    while (!SPI2STATbits.SPIRBF){
+		if (SYSTEM_RESET) break; 	//until received buffer fills, indicating data received 
+	}
+
     return SPI2BUF; // return received data and clear the read buffer full
 }
 
@@ -155,16 +166,26 @@ void initUART(void)
  DTW ALGORITHM
  ***************/
 
-float dtw(int *signal1, int *signal2, int signal1_start, int signal2_start, int length)
+float dtw(unsigned int *signal1, unsigned int *signal2, 
+			int signal1_start, int signal2_start, int length)
 {
     float result = 0;
-    int x;
+    int x = 0;
 
-    for(x = 0; x < length; x++)
-    {
+    //for(x = 0; x < length; x++)
+	while(x < length)
+    {	
+		if (SYSTEM_RESET) {
+			Slave_State = RESET_PRESSED;
+			break;
+		}
+
         result += (signal1[signal1_start + x] - signal2[signal2_start + x]) * (signal1[signal1_start + x] - signal2[signal2_start + x]);
+		x++;
     }
-
+	
+	if (SYSTEM_RESET) Slave_State = RESET_PRESSED;
+	
     // Normalize the result to accomodate variable lengths
     result = sqrt(result) / (length * 1.0);
 
@@ -173,12 +194,64 @@ float dtw(int *signal1, int *signal2, int signal1_start, int signal2_start, int 
 
 
 /***************
+ xcorrelation algorithm
+ ***************/
+
+void xcorr( unsigned int *a, unsigned int *b, int b_start, 
+				int signalLength, long long* max, int* maxIndex){
+	int n,k;
+	int ca, cb;
+
+	*max = 0;
+	*maxIndex = 0;
+	unsigned long long current;
+
+	for( n = 0; n < 2*signalLength ; n++ ){
+		
+		current = 0;
+		for (k = 0; k <= n; k++ ){
+			if (n-k < signalLength){
+				ca = a[n-k];
+			} else {
+				ca = 0;
+			} 
+
+			if (signalLength-1 >= k ) {
+				cb = b[signalLength - k-1];
+			} else {
+				cb = 0;
+			}
+
+			current = current + ca*cb;
+	//		results[n] = current;
+			
+		}
+		if (current > *max) {
+			*max = current;
+			*maxIndex = n;
+		}		
+	}
+}
+
+/***************
  MAIN
  ***************/
 
 int main(void)
 {
-    // GET THE AUDIO FILE ---------
+	const char *names[4];
+	names[0] = "yellow";
+	names[1] = "green";
+	names[2] = "red";
+	names[3] = "orange";
+
+	int encoding[4];
+	encoding[0] = 3;
+	encoding[1] = 2;
+	encoding[2] = 1;
+	encoding[3] = 4;
+
+    
 
 		
     // Initialize SPI/UART
@@ -187,165 +260,264 @@ int main(void)
 
     //float dtw_results[4] = {0, 0, 0, 0};
 
+	printf("\n\n==============================\n");
 	printf("Slave PIC running with UART\n");
 
-while(1) { /*
-    printf("Waiting for input audio data...\n");
+	printf("Turn on SW4 on the MASTER BOARD for double input. \n");
+	printf("Turn on SW4 on the SLAVE BOARD for correlation on. \n");
+	printf("Turn on SW3 on the SLAVE BOARD for verbose mode. \n");
+	printf("Please reset the system after changing the settings.\n");
+	printf("*Note, correlation is not time-efficient. \n\n");
+	
+	// Flag
+	TRISE = 0b000101;
 
-    // Receive the entirety of the input audio file
-    unsigned int temp;
-    unsigned int junk = 0;
-	int i = 0;
-    int j = 0;
-	int k = 0;
- 
-    while (i < NUM_DATA) {
-        temp = spi_send_receive(junk);
-        input_audio[i] = temp;
-		printf("%u, %u\n", i, temp);
-        ++i;
-    }
+	// Switches input 
+	// LEDS output
+	TRISD = 0xFF00;
+	PORTD = 0xFFFF;
 
-    // Print out received data
-    j = 0;
-    for ( ; j < NUM_DATA; j++) {
-        printf("%u, %u\n", j, input_audio[j]);
-    }
 
-    /*printf("Waiting for results of FPGA...\n");
 
-    // Receive the results of cross-correlation via SPI
-    unsigned int fpga_data[4];
+	unsigned int input_audio[2000];	
+	unsigned int input_audio2[2000];	
+	unsigned int temp;
+	unsigned int junk;
+	int i;
+	int j;
+	int maxIndex;
+	int maxIndex2;
+	long long maxValue;
+	long long maxValue2;
+	int double_input;
+	int correlation_on;
+	int debugging_on;
 
-    int j = 0;
-    for ( ; j < 4; j++) {
-        temp = spi_send_receive(junk);
-        fpga_data[j] = temp;
-    }
+	float min_dtw;
+	float min_dtw2;
+	int best_match;
+	int best_match2;
+	int delay;
+	float dtwResult;
 
-    printf("Parsing FPGA results...\n");
 
-    // Parse the data, keep track of best 2
-    // Data format:  [31:28] = identifier   mask: 0xF0000000
-    //               [27:15] = max index    mask: 0x0FFF8000
-    //               [14:0]  = max value    mask: 0x00007FFF
-    j = 0;
-    for ( ; j < 4; j++) {
-        // Mask out the identifier to match the data to a bank audio file
-        unsigned int bank_id = ((fpga[j] & 0xF0000000) >> 28);
 
-        // Mask out the max index and max value and save the data
-        audio_delays[bank_id] = NUM_DATA - ((fpga[j] & 0x0FFF8000) >> 15);
-        fpga_results[bank_id] = (fpga[j] & 0x00007FFF);
-
-        // Keep track of the best results
-        if (fpga_results[bank_id] > best_value[0]) {
-            best_index[1] = best_index[0];
-            best_value[1] = best_value[0];
-            best_index[0] = bank_id;
-            best_value[0] = fpga_results[bank_id];
-        }
-        else if (fpga_results[bank_id] > best2) {
-            best_index[1] = bank_id;
-            best_value[1] = fpga_results[bank_id];
-        }
-    } */
-
-    /*printf("Performing DTW...\n");
-
-	j = 0;
-	k = 0;
-
-	int audiobankOffset;
-	int min_dtw = 0xFFFF;
-	int best_match = 0;
-
-	printf("234234\n");
-	// processing dtw
-	for ( ; j < 4 ; j ++ ) {
-		
-		//audiobankOffset = offset[j];
-		float temp = dtw(input_audio, HelloByeYesNo, 0, j*2000, NUM_DATA);
-		
-       printf("Result for %i: %f\n", names[j], temp);
-
-		if (temp < min_dtw) {
-			min_dtw = temp;
-			best_match = j;
-		}
-	}
-
-	printf("best match is %i\n", best_match);
-	printf("min_dtw for %i: %f\n", min_dtw);
-/*	printf("I think you said %i!\n", names[best_match]); */
-
-}
-}
+DATA_READY = 0;
+while(1) { 
 
 	
+	switch(Slave_State)
+	{
+		// For debouncing the reset switch
+		case RESET_PRESSED:
+			i = 0;
+			printf("Reset pressed \n\n");
+			while(i < 99999) i++;
 
-    // Perform DTW
-    /* j = 0;
-    for ( ; j < 2; j++) {
-        short delay = audio_delays[j];
+			Slave_State = WAITING_FOR_INPUT;
+			break;
+		case WAITING_FOR_INPUT:
+			DATA_READY = 0; 
+			// Receive the entirety of the input audio file
+			printf("------------------------\n");
+		
+			double_input = DOUBLE_INPUT;
+			correlation_on = CORRELATION_ON;
+			debugging_on = DEBUGGING_ON;
+			if (double_input) printf("\n*Double input is mode on. \n");
+			if (correlation_on) printf("*Correlation mode is on. \n");
+			if (debugging_on) printf("Debugging output is on. \n\n");
+			
+			
+			junk = 0;
+			i = 0;
+			j = 0;
+			unsigned short NUM_DATA = 2000; 
 
-        // If the delay is negative, the bank signal starts first
-        //       ""        positive, the input signal starts first
-        if (delay < 0) {
-            dtw_results[j] = dtw(input_audio, audio_bank[best_index[j]], delay, 0, NUM_DATA + delay);
-        }
-        else {
-            dtw_results[j] = dtw(input_audio, audio_bank[best_index[j]], 0, delay, NUM_DATA - delay);
-        }  
-    } */
+			// Takes in audio data from master PIC via SPI
+			printf("\nReady for audio input.\n");
+			while (i < NUM_DATA) {
+				if (SYSTEM_RESET) break;
+			
+				temp = spi_send_receive(junk);
+				input_audio[i] = temp;
+				++i;
+			}
 
+			// If in double input, get second audio data
+			if (double_input) {
+				if (!SYSTEM_RESET) printf("\nReady for audio input 2.\n");
+			
+				junk = 0;
+				i = 0;
+				j = 0;
+				unsigned short NUM_DATA = 2000; 
+	
+				while (i < NUM_DATA) {
+					if (SYSTEM_RESET) break;
+				
+					temp = spi_send_receive(junk);
+					input_audio2[i] = temp;
+					++i;
+				}
+			}
+			
+			
+			// check if system reset before changing states
+			if (SYSTEM_RESET) {
+				Slave_State = RESET_PRESSED;
+				break;
+			} else {
+				Slave_State = PROCESS_DATA;
+				break;
+			}
+			break;
+			
+		case PROCESS_DATA:
+			printf("Processing audio input...\n");
+			
+			maxIndex = 0;
+			maxValue = 0;
 
-    //Print out the best match using UART
-    //TODO: Tolerance level for a "match"
-/*
-    if (dtw_results[0] > dtw_results[1]) {
-        printf("The closest matched word was %s", audio_bank[best_index[0]]);
-    }
-    else {
-        printf("The closest matched word was %s", audio_bank[best_index[1]]);
-    } */
-//}
+			min_dtw = 0xFFFF;
+			min_dtw2 = 0xFFFF;
+			best_match2 = 0;
+			best_match = 0;
+			delay;
+			dtwResult;
 
-    // PWM CODE BELOW
-    //// Reset the index for playback
-    //i = 0;
-    //
-    //// Enable system-wide interrupt to multivectored mode
-    //INTEnableSystemMultiVectoredInt();
-    //
-    //initTimer();
-    //initPWM();
-    //
-    //// Set initial values
-    //PR2 = 2932;
-    //OC5R = 0;
-    //
-    //setupInterrupt();
-    //
-    //// Turn on the timer and PWM
-    //T2CONbits.ON = 1;
-    //OC5CONbits.ON = 1;
-    //
-    // while (1) { }
+			for (j = 0 ; j < 4 ; j ++ ) {
+				maxValue = 0;
+				delay = 0;
+				
+				// use correlation to find the "delay" of the two signals to best align
+				// them before calculating dtw		
+				if (correlation_on){
+				//	printf("%i\n", j);
+					printf("Performing correlation...\n");
+					xcorr( input_audio, YellowGreenRedOrange, j*2000, NUM_DATA, &maxValue, &maxIndex);
+	
+					if (debugging_on) printf("the max index %i, and the max value %llu for %i\n", maxIndex, maxValue, j);
+	
+					delay = NUM_DATA - maxIndex; 
+	
+					if (debugging_on) printf("the delay is %i\n", delay);
+					
+				}
+				
+				// calculate dtw for input audio with audio in the bank
+				if (debugging_on)printf("Performing DTW...\n"); 
+				if (delay > 0) dtwResult = dtw(input_audio, YellowGreenRedOrange, 0, j*2000 + delay, NUM_DATA - delay);
+				else dtwResult = dtw(input_audio, YellowGreenRedOrange, -delay, j*2000, NUM_DATA + delay);
 
+				if (debugging_on) printf("     Result for %s: %f\n", names[j], dtwResult);
 
-//void __ISR(_TIMER_2_VECTOR, ipl7) T2_IntHandler (void)
-//{   
-//    if (i < NUM_DATA) {
-//        OC5RS = PR2* (audio[i]/1024.0);          // Load the next duty cycle from the array
-//        ++i;                       // Move to the next piece of data
-//    }
-//    else {
-//        //OC5RS = 1000;                  // Stop audio after the signal is done
-//        OC5RS = audio[0];                // Loop audio
-//        i = 0;
-//    }
-//  
-//    TMR2 = 0;                  // Reset Timer2
-//    IFS0CLR = 0x0100;          // Clear the Timer2 interrupt flag
-//}
+				if (dtwResult < min_dtw) {
+					min_dtw = dtwResult;
+					best_match = j; 
+				}
+			}
+
+		
+			// if in double-input mode
+			if (double_input) {
+				printf("Processsing audio input 2...\n");
+
+				for (j = 0 ; j < 4 ; j ++ ) {
+					maxValue = 0;
+					delay = 0;
+							
+					if (correlation_on) {
+						if (debugging_on)printf("Performing correlation...\n");
+						xcorr( input_audio, YellowGreenRedOrange, j*2000, NUM_DATA, &maxValue, &maxIndex);
+		
+						if (debugging_on) printf("the max index %i, and the max value %llu for %i\n", maxIndex, maxValue, j);
+		
+						delay = NUM_DATA - maxIndex; 
+		
+						if (debugging_on) if (debugging_on) printf("the delay is %i\n", delay);
+						
+					}
+
+					if (debugging_on)printf("Performing DTW...\n"); 
+					if (delay > 0) dtwResult = dtw(input_audio2, YellowGreenRedOrange, 0, j*2000 + delay, NUM_DATA - delay);
+					else dtwResult = dtw(input_audio2, YellowGreenRedOrange, -delay, j*2000, NUM_DATA + delay);
+	
+					if (debugging_on) printf("     Result for audio 2 %s: %f\n", names[j], dtwResult);
+	
+					if (dtwResult < min_dtw2) {
+						min_dtw2 = dtwResult;
+						best_match2 = j; 
+					}
+				}
+
+			}
+			
+			if (SYSTEM_RESET) {
+				Slave_State = RESET_PRESSED;
+			} else {
+				Slave_State = DONE_PROCESSING;
+			}
+			break;
+		
+		case DONE_PROCESSING:
+
+			// what to print if only one audio
+			if (!double_input) {
+				if (debugging_on) printf("best match is %i\n", best_match);
+				if (debugging_on) printf("min_dtw for %s: %f\n", names[best_match], min_dtw);
+
+				printf("\nI think you said %s!\n", names[best_match]);
+			
+				if (debugging_on) printf("I am sending... %i \n", encoding[best_match]);
+
+				// send result back to master pic
+				DATA_READY = 1;
+			//	spi_send_receive(encoding[best_match]);
+				
+				PORTD = encoding[best_match];
+				printf("set porte to %i\n", encoding[best_match]);
+
+			// if double audio
+			} else {
+				if (debugging_on){
+					printf("best match for audio 1 is %i\n", best_match);
+					printf("min_dtw for audio 1 is %s: %f\n", names[best_match], min_dtw);
+
+				}
+
+				if (debugging_on) printf("best match for audio 2 is is %i\n", best_match2);
+				if (debugging_on) printf("min_dtw for audio 2 %s: %f\n", names[best_match2], min_dtw2);
+				
+				// if both audio matched, then we have a result
+				if (best_match == best_match2) {
+					printf("\nBoth recordings matched!\n");
+					printf("I think you said %s!\n", names[best_match]);
+					if (debugging_on) printf("I am sending... %i \n", encoding[best_match]);
+
+					DATA_READY = 1;
+				//	spi_send_receive(encoding[best_match]);
+				//	DATA_READY = 0;
+					PORTD = encoding[best_match];
+
+					printf("set porte to %i\n", encoding[best_match]);
+
+				// if audio did not match :(
+				} else {
+					printf("\nRecordings did not match. No match found! :(\n");
+					if (debugging_on) printf("I am sending... %i \n", 0b1111);
+
+					DATA_READY = 1;
+				//	spi_send_receive(0b1111);
+				//	DATA_READY = 0;
+					PORTD = 0;
+				} 
+			}
+
+  
+			Slave_State = WAITING_FOR_INPUT;
+			break;
+	}
+}	
+}
+

@@ -1,1 +1,1 @@
-pic_slave.o: pic_slave.c HelloByeYesNo.h
+pic_slave.o: pic_slave.c YellowGreenRedOrange.h
