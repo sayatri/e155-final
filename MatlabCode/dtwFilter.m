@@ -1,4 +1,4 @@
-function [ matchedSignal, second, third ] = dtwFilter( testSignal, allSignals, allSignalNames )
+function [ matchedSignal, second, third ] = dtwFilter( testSignal, allSignals, allSignalNames, delayFlag )
 % Description of Matching Algorithm:
 % 
 % 
@@ -22,14 +22,48 @@ thirdInd = secondInd;
 
 % Analyze first signal
 preRec = allSignals(:,1);
-minDist = dtw(testSignal, preRec, 20);
+
+if delayFlag == 1
+    delay = findDelay(testSignal, preRec);
+else 
+    delay = 0;
+end
+
+newEnd = length(testSignal) - abs(delay);
+newStart = abs(delay);
+
+if delay < 0
+    minDist = dtw(testSignal(newStart:end), preRec(1:newEnd), 20);
+elseif delay == 0
+    minDist = dtw(testSignal, preRec, 20);
+else
+    minDist = dtw(testSignal(1:newEnd), preRec(newStart:end), 20);
+end
+
+
 secondDist = minDist;
 thirdDist = secondDist;
 
 % loop through all the the other signals and compare to previous analysis
 for i = 2:len
     preRec = allSignals(:,i);
-    newDist = dtw(testSignal, preRec, 20);
+    
+    if delayFlag == 1
+        delay = findDelay(testSignal, preRec);
+    else 
+        delay = 0;
+    end
+    
+    newEnd = length(testSignal)-abs(delay);
+    newStart = abs(delay);
+    
+    if delay < 0
+        newDist = dtw(testSignal(newStart:end), preRec(1:newEnd), 20);
+    elseif delay == 0
+        newDist = dtw(testSignal, preRec, 20);
+    else
+        newDist = dtw(testSignal(1:newEnd), preRec(newStart:end), 20);
+    end
     
     if newDist < minDist
         thirdDist = secondDist;

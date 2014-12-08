@@ -1,26 +1,4 @@
-close all
-% Control to make sure correlation is correct
-a = [0 0 0 0 0 2 3 0];
-b = [0 0 0 2 3 0 0 0];
-
-figure
-subplot(2,1,1)
-plot(a)
-title('a');
-subplot(2,1,2)
-plot(b)
-title('b');
-% 
-% matlabXcorr = xcorr(a, b)
-% figure
-% plot(matlabXcorr)
-% title('Result of matlab xcorr');
-
-%
-%
-% figure
-% plot(conv(a,fliplr(b)))
-% title('Result of xcorr with conv');
+function [delay] = findDelay (a, b)
 
 % DO NOT CHANGE THIS IS PERFECT %%
 result = zeros(2*length(a) - 1,1);
@@ -42,10 +20,7 @@ for n=1:(2*length(a) - 1)
     end
 end
 
-figure
-plot(result)
-title('Result of xcorr with for loop');
 
 [~,indexMax] = max(abs(result));
 
-delay = ceil(length(result)/2) - indexMax
+delay = ceil(length(result)/2) - indexMax;
