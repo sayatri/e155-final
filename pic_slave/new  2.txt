@@ -1,0 +1,26 @@
+// *****************************************************************************
+// *****************************************************************************
+// Data Structures
+// *****************************************************************************
+// *****************************************************************************
+
+// Describe the state of the PIC MASTER
+typedef enum _STATE
+{
+    READY_TO_LISTEN,
+    LISTENING,
+	WINDOWING,
+    FILTERING,
+    TRANSMITTING,
+    // processing states
+    PROCESSING_DATA,
+    // SENDING_DATA_TO_FPGAS,
+    // RECEIVED_DATA_FROM_ONE_FPGA,
+    // RECEIVED_DATA_FROM_BOTH_FPGA,
+    // SENDING_DATA_PIC,
+    // RECEIVED_DATA_FROM_PIC,
+
+    // completed processing
+    COMPLETED_PROCESSING,
+	DONE
+} STATE;
